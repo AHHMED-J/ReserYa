@@ -1,0 +1,208 @@
+<!doctype html>
+<!-- Generador de las pantallas de alta fidelidad de ReserYa (SVG para importar en Figma).
+     Uso: python3 servidor.py "$(pwd)"  dentro de esta carpeta, abrir http://127.0.0.1:8765/generador.html
+     y ejecutar en la consola: await run('pantallas')  (o 'guia' / 'propuestas' / 'all'). Los SVG quedan en shots/. -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#dfe3e7}#out{transform-origin:0 0;display:flex;flex-wrap:wrap;gap:40px;padding:20px;width:3200px}#out>div{background:#fff}</style>
+</head><body><div id="out"></div>
+<script>
+const IC={
+search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+sliders:'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/>',
+home:'<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+cal:'<path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+rotate:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+bell:'<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+star:'<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
+chev:'<path d="m9 18 6-6-6-6"/>',
+x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+scissors:'<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>',
+flag:'<path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"/>',
+smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/>',
+leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+sparkles:'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+activity:'<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+paw:'<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>'
+};
+const CAT={bar:'scissors',can:'flag',den:'smile',spa:'leaf',una:'sparkles',fis:'activity',dog:'paw'};
+const TB={bar:['#FFE2D2','#FFD0BA','#D2683F'],can:['#DDF5EA','#C8EDDA','#2E9466'],den:['#DDEFFA','#C9E3F6','#3584BD'],spa:['#EEE6FB','#DED0F6','#8360C4'],una:['#FDE3EC','#F8CDDC','#C24F78'],fis:['#FFF0CC','#FFE3A6','#B07C0C'],dog:['#FDEBD8','#FADBBD','#B06F33']};
+const A={key:'a',name:'Opción A · Limpio y moderno',desc:'Fondo blanco, bordes finos y colores sólidos: el azul primario marca las acciones y el degradado solo vive en el logo. Botones con esquinas suaves. Letra: Plus Jakarta Sans.',
+font:'Plus Jakarta Sans',bg:'#FFFFFF',headerBg:'#FFFFFF',card:'#FFFFFF',stroke:'#E3E9EF',sh:null,text:'#0E1A26',muted:'#5D6B79',brand:'#0E1A26',primary:'#0A7DB2',onP:'#FFFFFF',
+a1:'#25A8D6',a2:'#6DD4BF',star:'#F5A524',starE:'#C7D0D9',rC:16,rB:12,rS:14,rI:12,searchBg:'#F4F7FA',revBg:'#F2F8FB',revStroke:'#D9EBF4',revLabel:'#0A7DB2',revBtn:'#0E1A26',revBtnT:'#FFFFFF',
+badgeGrad:false,badgeBg:'#0A7DB2',badgeT:'#FFFFFF',flat:true,upper:true,okBg:'#E2F6EE',okFg:'#0B7A55',neuBg:'#EEF2F6',neuFg:'#4A5967',navBg:'#FFFFFF',navLine:true,navSh:null,navR:0,pill:'#EAF5FB',pillSh:null,linkT:'#3B4856',
+tint:k=>['#E4F3FA','#E1F6F0','#2B95C2'],sw:[['#25A8D6','Azul (logo)'],['#6DD4BF','Menta (logo)'],['#0A7DB2','Primario'],['#0E1A26','Texto'],['#F4F7FA','Superficie']]};
+const B={key:'b',name:'Opción B · Cálido y amigable',desc:'Fondo crema, tarjetas blancas con sombra suave, botones redondos y acentos coral junto al verde agua del logo. Letra: Nunito.',
+font:'Nunito',bg:'#FFF7EF',headerBg:'#FFF7EF',card:'#FFFFFF',stroke:null,sh:{c:'#8A5A3C',a:0.10,y:6,r:18},text:'#33292A',muted:'#857670',brand:'#13827E',primary:'#13827E',onP:'#FFFFFF',
+a1:'#45C0C6',a2:'#6DD4BF',star:'#FFB23F',starE:'#E9C3B3',rC:22,rB:999,rS:999,rI:999,searchBg:'#FFFFFF',revBg:'#FFE8DE',revStroke:null,revLabel:'#B9502F',revBtn:'#FF8A65',revBtnT:'#3A1E12',
+badgeGrad:false,badgeBg:'#FF8A65',badgeT:'#3A1E12',upper:false,okBg:'#DDF4EA',okFg:'#1D7A55',neuBg:'#F4ECE6',neuFg:'#7A6A62',navBg:'#FFFFFF',navLine:false,navSh:{c:'#8A5A3C',a:0.10,y:-4,r:20},navR:24,pill:'#FFFFFF',pillSh:{c:'#8A5A3C',a:0.08,y:3,r:10},linkT:'#4A3F3B',
+tint:k=>TB[k],sw:[['#45C0C6','Verde agua (logo)'],['#13827E','Primario'],['#FF8A65','Coral'],['#FFF7EF','Crema'],['#33292A','Texto']]};
+
+const cv=document.createElement('canvas').getContext('2d');
+const mw=(s,sz,w,f)=>{cv.font=`${w} ${sz}px "${f}"`;return cv.measureText(s).width;};
+const capH=(sz,w,f)=>{cv.font=`${w} ${sz}px "${f}"`;return cv.measureText('H').actualBoundingBoxAscent;};
+const r2=v=>Math.round(v*100)/100;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const rgb01=h=>[1,3,5].map(i=>r2(parseInt(h.slice(i,i+2),16)/255));
+let LOGO='';
+
+class S{
+ constructor(w,h,name,T){this.w=w;this.h=h;this.name=name;this.T=T;this.defs=[];this.b=[];this.n=0;this.ids=new Set();}
+ uid(n){let b=n.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'')||'capa';if(/^[0-9]/.test(b))b='n_'+b;let id=b,i=2;while(this.ids.has(id))id=b+'_'+(i++);this.ids.add(id);return id;}
+ grad(c1,c2,dir){const id=this.uid('grad');const c=dir==='h'?'x1="0" y1="0" x2="1" y2="0"':'x1="0" y1="0" x2="1" y2="1"';this.defs.push(`<linearGradient id="${id}" ${c}><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`);return `url(#${id})`;}
+ shadow(sh){if(!sh)return '';const id=this.uid('sombra');const [r,g,b]=rgb01(sh.c);this.defs.push(`<filter id="${id}" x="-30%" y="-40%" width="160%" height="200%" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/><feOffset dy="${sh.y}"/><feGaussianBlur stdDeviation="${sh.r/2}"/><feComposite in2="hardAlpha" operator="out"/><feColorMatrix type="matrix" values="0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${b} 0 0 0 ${sh.a} 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter>`);return ` filter="url(#${id})"`;}
+ g(n){this.b.push(`<g id="${this.uid(n)}">`);} end(){this.b.push('</g>');}
+ rect(x,y,w,h,o={}){const sw=o.stroke?(o.sw||1):0;const rx=o.rx?` rx="${r2(Math.min(o.rx,h/2,w/2))}"`:'';const st=o.stroke?` stroke="${o.stroke}" stroke-width="${sw}"`:'';const f=this.shadow(o.sh);
+  const shape=`<rect id="${this.uid(o.name||'Rect')}" x="${r2(x+sw/2)}" y="${r2(y+sw/2)}" width="${r2(w-sw)}" height="${r2(h-sw)}"${rx} fill="${o.fill||'none'}"${st}/>`;
+  this.b.push(f?`<g${f}>${shape}</g>`:shape);}
+ image(x,y,w,h,href,n){this.b.push(`<image id="${this.uid(n)}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet" xlink:href="${href}" href="${href}"/>`);}
+ icon(n,x,y,s,c,sw=2,fill=false){this.b.push(`<g id="${this.uid('icono '+n)}" transform="translate(${r2(x)} ${r2(y)}) scale(${r2(s/24)})" fill="${fill?c:'none'}" stroke="${fill?'none':c}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${IC[n]}</g>`);}
+ text(x,top,s,o){const f=o.font||this.T.font,sz=o.size,w=o.w||400;if(o.upper)s=s.toUpperCase();const ls=o.ls||0;const base=top+capH(sz,w,f);
+  this.b.push(`<text id="${this.uid(o.name||s.slice(0,28))}" x="${r2(x)}" y="${r2(base)}" font-family="${f}" font-size="${sz}" font-weight="${w}" fill="${o.fill}"${ls?` letter-spacing="${ls}"`:''} xml:space="preserve">${esc(s)}</text>`);
+  return mw(s,sz,w,f)+ls*s.length;}
+ tw(s,o){const f=o.font||this.T.font;if(o.upper)s=s.toUpperCase();return mw(s,o.size,o.w||400,f)+(o.ls||0)*s.length;}
+ mid(x,cy,s,o){const f=o.font||this.T.font;return this.text(x,cy-capH(o.size,o.w||400,f)/2,s,o);}
+ center(cx,cy,s,o){return this.mid(cx-this.tw(s,o)/2,cy,s,o);}
+ wrap(s,maxW,o){const words=s.split(' ');const lines=[];let cur='';for(const wd of words){const t=cur?cur+' '+wd:wd;if(this.tw(t,o)>maxW&&cur){lines.push(cur);cur=wd;}else cur=t;}if(cur)lines.push(cur);return lines;}
+ fit(s,maxW,o){if(this.tw(s,o)<=maxW)return s;while(s.length>1&&this.tw(s+'…',o)>maxW)s=s.slice(0,-1);return s.trim()+'…';}
+ out(){return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${this.w}" height="${this.h}" viewBox="0 0 ${this.w} ${this.h}" fill="none"><defs>${this.defs.join('')}<clipPath id="recorte"><rect width="${this.w}" height="${this.h}"/></clipPath></defs><g id="${this.uid(this.name)}" clip-path="url(#recorte)">${this.b.join('')}</g></svg>`;}
+}
+
+// ---------- piezas ----------
+function photo(s,x,y,w,h,k,r){const T=s.T;const [c1,c2,ic]=T.tint(k);s.g('Foto');s.rect(x,y,w,h,{fill:T.flat?c1:s.grad(c1,c2),rx:r,name:'Imagen'});const is=Math.round(Math.min(w,h)*0.34);s.icon(CAT[k],x+(w-is)/2,y+(h-is)/2,is,ic,1.6);s.end();}
+function card(s,x,y,w,h,n){const T=s.T;s.rect(x,y,w,h,{fill:T.card,rx:T.rC,stroke:T.stroke,sh:T.sh,name:n||'Tarjeta'});}
+function iconBtn(s,x,y,sz,ic){const T=s.T;s.g('Boton '+ic);s.rect(x,y,sz,sz,{fill:'#FFFFFF',rx:T.rI,stroke:T.stroke,sh:T.sh,name:'Fondo'});s.icon(ic,x+(sz-20)/2,y+(sz-20)/2,20,T.text,1.8);s.end();}
+function btn(s,x,y,label,o){const T=s.T;const h=o.h,sz=o.size,px=o.px||18,isz=o.isz||18;const tw=s.tw(label,{size:sz,w:700});const w=px*2+tw+(o.icon?isz+8:0);
+ s.g('Boton '+label);s.rect(x,y,w,h,{fill:o.fill||T.primary,rx:o.rx||T.rB,stroke:o.stroke,name:'Fondo'});let tx=x+px;if(o.icon){s.icon(o.icon,tx,y+(h-isz)/2,isz,o.color||T.onP,2.2);tx+=isz+8;}s.mid(tx,y+h/2,label,{size:sz,w:700,fill:o.color||T.onP});s.end();return w;}
+function chip(s,x,cy,label,ok,sz=11,h=20){const T=s.T;const tw=s.tw(label,{size:sz,w:700});s.g('Etiqueta');s.rect(x,cy-h/2,tw+16,h,{fill:ok?T.okBg:T.neuBg,rx:h/2,name:'Fondo'});s.mid(x+8,cy,label,{size:sz,w:700,fill:ok?T.okFg:T.neuFg});s.end();}
+function badge(s,x,y,label,sz=10,h=20){const T=s.T;const o={size:sz,w:800,upper:T.upper,ls:T.upper?0.6:0};const tw=s.tw(label,o);s.g('Insignia');s.rect(x,y,tw+18,h,{fill:T.badgeGrad?s.grad(T.a1,T.a2,'h'):T.badgeBg,rx:h/2,name:'Fondo'});s.mid(x+9,y+h/2,label,{...o,fill:T.badgeT});s.end();}
+function stars(s,x,y,n,sz,c){s.g('Estrellas');for(let i=0;i<n;i++)s.icon('star',x+i*(sz+4),y,sz,c,1.6);s.end();}
+function meta(s,x,top,r,cnt,cat,sz){const T=s.T;const ch=capH(sz,700,T.font);s.g('Calificacion');s.icon('star',x,top+ch/2-sz/2,sz,T.star,2,true);let cx=x+sz+4;cx+=s.text(cx,top,r,{size:sz,w:700,fill:T.text});s.text(cx+4,top,(cnt?`(${cnt}) · `:'· ')+cat,{size:sz,fill:T.muted});s.end();}
+function search(s,x,y,w,h,bs,q){const T=s.T;s.g('Buscador');s.rect(x,y,w,h,{fill:T.searchBg,rx:T.rS,stroke:T.stroke,sh:T.sh,name:'Fondo'});s.icon('search',x+16,y+(h-20)/2,20,T.muted,2);
+ s.mid(x+46,y+h/2,q||'Buscar negocios o servicios…',{size:14,w:q?600:500,fill:q?T.text:T.muted});const bx=x+w-6-bs,by=y+(h-bs)/2;s.g('Filtros');s.rect(bx,by,bs,bs,{fill:T.primary,rx:T.rB===999?bs/2:10,name:'Fondo'});s.icon('sliders',bx+(bs-18)/2,by+(bs-18)/2,18,'#FFFFFF',2);s.end();s.end();}
+function secHead(s,x,top,w,title,link,sz){const T=s.T;s.g('Titulo '+title);s.text(x,top,title,{size:sz,w:800,fill:T.text});const o={size:13,w:700,fill:T.primary};const lw=s.tw(link,o);s.text(x+w-lw,top+capH(sz,800,T.font)-capH(13,700,T.font),link,o);s.end();}
+function listCard(s,x,y,w,h,d,o){const T=s.T;s.g('Negocio '+d.n);card(s,x,y,w,h);photo(s,x+10,y+(h-o.img)/2,o.img,o.img,d.k,T.rC-8);const tx=x+10+o.img+14;
+ s.text(tx,y+16,d.n,{size:o.ns,w:800,fill:T.text});const mt=y+16+o.ns+6;meta(s,tx,mt,d.r,d.c,d.cat,o.ms);const pt=mt+o.ms+9;const pw=s.text(tx,pt,d.p,{size:o.ms+1,w:800,fill:T.text});
+ chip(s,tx+pw+8,pt+capH(o.ms+1,800,T.font)/2,d.av,d.ok,o.ms-1,o.ms+8);if(o.chev)s.icon('chev',x+w-14-18,y+h/2-9,18,T.muted,2);s.end();}
+
+const UN={n:'Uñas Glam',r:'4.7',c:'85',cat:'Salón de uñas',p:'Desde $250',av:'Disponible hoy',ok:true,k:'una'};
+const FI={n:'Fisio Activa',r:'4.8',c:'40',cat:'Fisioterapia',p:'Desde $450',av:'Mañana',ok:false,k:'fis'};
+const CF={n:'Corte Fino',r:'4.4',c:'22',cat:'Barbería',p:'Desde $220',av:'Hoy 19:00',ok:true,k:'bar'};
+const PF={n:'Peludos Felices',r:'4.6',c:'31',cat:'Estética canina',p:'Desde $300',av:'Hoy 17:30',ok:true,k:'dog'};
+
+function mobile(T){const s=new S(360,800,'Inicio celular · '+T.name,T);
+ s.rect(0,0,360,800,{fill:T.bg,name:'Fondo'});
+ s.g('Encabezado');s.image(16,14,30,30,LOGO,'Logo');s.mid(54,29,'ReserYa',{size:20,w:800,fill:T.brand});iconBtn(s,304,9,40,'bell');s.end();
+ s.g('Saludo');s.text(16,64,'Hola, Ana',{size:14,w:500,fill:T.muted});s.text(16,86,'¿Qué quieres reservar hoy?',{size:22,w:800,fill:T.text});s.end();
+ search(s,16,124,328,52,40);
+ secHead(s,16,196,328,'Recientes','Ver todo',17);
+ s.g('Recientes');[['Barbería El Patrón','Barbería','bar'],['Cancha La 10','Canchas de fútbol','can'],['Dental Sonrisa','Dentista','den']].forEach(([n,c,k],i)=>{const x=16+i*144,y=222;
+  s.g('Reciente '+n);card(s,x,y,132,146);photo(s,x+8,y+8,116,76,k,T.rC-6);s.text(x+10,y+96,s.fit(n,114,{size:13,w:800}),{size:13,w:800,fill:T.text});s.text(x+10,y+116,s.fit(c,114,{size:12}),{size:12,fill:T.muted});s.end();});s.end();
+ // reseña + recomendado
+ const y2=384;s.g('Dar resena');s.rect(16,y2,158,172,{fill:T.revBg,rx:T.rC,stroke:T.revStroke,name:'Fondo'});
+ s.text(30,y2+16,'Dar reseña',{size:11,w:800,fill:T.revLabel,upper:T.upper,ls:T.upper?0.6:0});
+ const q=s.wrap('¿Qué tal tu cita en Barbería El Patrón?',130,{size:14,w:800});q.forEach((l,i)=>s.text(30,y2+36+i*19,l,{size:14,w:800,fill:T.text}));
+ stars(s,30,y2+36+q.length*19+4,5,18,T.starE);btn(s,30,y2+172-14-32,'Calificar',{h:32,size:13,px:14,fill:T.revBtn,color:T.revBtnT});s.end();
+ s.g('Recomendado');card(s,186,y2,158,172);photo(s,194,y2+8,142,84,'spa',T.rC-6);badge(s,202,y2+16,'Recomendado');
+ s.text(196,y2+104,'Spa Brisa',{size:15,w:800,fill:T.text});meta(s,196,y2+128,'4.9','','Masajes',12);s.end();
+ secHead(s,16,574,328,'Negocios recomendados','Ver todo',17);
+ s.g('Negocios recomendados');listCard(s,16,600,328,86,UN,{img:64,ns:15,ms:12,chev:true});listCard(s,16,696,328,86,FI,{img:64,ns:15,ms:12,chev:true});s.end();
+ // barra inferior
+ s.g('Barra inferior');if(T.navR)s.rect(0,722,360,110,{fill:T.navBg,rx:T.navR,sh:T.navSh,name:'Fondo'});else{s.rect(0,722,360,78,{fill:T.navBg,name:'Fondo'});s.rect(0,722,360,1,{fill:T.stroke,name:'Linea'});}
+ [['home','Inicio',1,40],['search','Buscar',0,110],['cal','Reservas',0,250],['user','Perfil',0,320]].forEach(([ic,l,a,cx])=>{const c=a?T.primary:T.muted;s.g('Tab '+l);s.icon(ic,cx-11,736,22,c,a?2.2:1.8);s.center(cx,770,l,{size:11,w:a?800:600,fill:c});s.end();});
+ s.g('Volver a agendar');s.rect(152,706,56,56,{fill:T.flat?T.primary:s.grad(T.a1,T.a2),rx:28,sh:T.flat?{c:'#0A4A6B',a:0.25,y:6,r:14}:{c:T.a1,a:0.35,y:6,r:14},name:'Fondo'});s.icon('rotate',168,722,24,'#FFFFFF',2.2);s.end();s.end();
+ return s.out();}
+
+function desktop(T){const s=new S(1280,800,'Inicio computadora · '+T.name,T);
+ s.rect(0,0,1280,800,{fill:T.bg,name:'Fondo'});
+ s.g('Encabezado');s.rect(0,0,1280,72,{fill:T.headerBg,name:'Fondo'});if(T.navLine)s.rect(0,71,1280,1,{fill:T.stroke,name:'Linea'});
+ s.image(48,18,36,36,LOGO,'Logo');s.mid(94,36,'ReserYa',{size:22,w:800,fill:T.brand});search(s,232,13,440,46,34);
+ s.g('Avatar');s.rect(1190,15,42,42,{fill:T.flat?T.pill:s.grad(T.a1,T.a2),rx:21,name:'Fondo'});s.center(1211,36,'A',{size:16,w:800,fill:T.flat?T.primary:'#FFFFFF'});s.end();
+ iconBtn(s,1136,15,42,'bell');
+ const bl='Volver a agendar';const bw=18*2+s.tw(bl,{size:14,w:700})+18+8;const bx=1136-12-bw;btn(s,bx,15,bl,{h:42,size:14,icon:'rotate'});
+ const l2='Mis reservas',l1='Inicio';const w2=s.tw(l2,{size:15,w:600})+28,w1=s.tw(l1,{size:15,w:800})+28;const x2=bx-14-w2,x1=x2-4-w1;
+ s.g('Menu');s.rect(x1,18,w1,36,{fill:T.pill,rx:T.rB===999?18:10,sh:T.pillSh,name:'Activo'});s.mid(x1+14,36,l1,{size:15,w:800,fill:T.primary});s.mid(x2+14,36,l2,{size:15,w:600,fill:T.linkT});s.end();
+ s.end();
+ s.g('Saludo');s.text(48,98,'Hola, Ana',{size:15,w:500,fill:T.muted});s.text(48,122,'¿Qué quieres reservar hoy?',{size:28,w:800,fill:T.text});s.end();
+ secHead(s,48,178,1184,'Recientes','Ver todo',18);
+ s.g('Recientes');[['Barbería El Patrón','Barbería','bar'],['Cancha La 10','Canchas de fútbol','can'],['Spa Brisa','Masajes','spa'],['Dental Sonrisa','Consultorio dental','den']].forEach(([n,c,k],i)=>{const x=48+i*301,y=206;
+  s.g('Reciente '+n);card(s,x,y,281,176);photo(s,x+10,y+10,261,104,k,T.rC-6);s.text(x+12,y+128,n,{size:15,w:800,fill:T.text});s.text(x+12,y+150,c,{size:13,fill:T.muted});s.end();});s.end();
+ const y=404;s.g('Dar resena');s.rect(48,y,380,204,{fill:T.revBg,rx:T.rC,stroke:T.revStroke,name:'Fondo'});s.text(70,y+24,'Dar reseña',{size:12,w:800,fill:T.revLabel,upper:T.upper,ls:T.upper?0.7:0});
+ const q=s.wrap('¿Qué tal tu cita en Barbería El Patrón?',336,{size:20,w:800});q.forEach((l,i)=>s.text(70,y+48+i*26,l,{size:20,w:800,fill:T.text}));
+ stars(s,70,y+48+q.length*26+6,5,24,T.starE);btn(s,70,y+204-22-40,'Calificar',{h:40,size:14,px:18,fill:T.revBtn,color:T.revBtnT});s.end();
+ s.g('Recomendado destacado');card(s,448,y,784,204);photo(s,462,y+14,300,176,'una',T.rC-6);badge(s,788,y+26,'Recomendado',11,22);
+ s.text(788,y+62,'Uñas Glam',{size:26,w:800,fill:T.text});meta(s,788,y+100,'4.7','85','Salón de uñas',15);const pw=s.text(788,y+128,'Desde $250',{size:16,w:800,fill:T.text});
+ chip(s,788+pw+10,y+128+capH(16,800,T.font)/2,'Disponible hoy 18:00',true,12,24);btn(s,788,y+150,'Ver negocio',{h:42,size:14,px:22});s.end();
+ secHead(s,48,636,1184,'Negocios recomendados','Ver todo',18);
+ s.g('Negocios recomendados');const cw=(1184-40)/3;[FI,CF,PF].forEach((d,i)=>listCard(s,48+i*(cw+20),664,cw,100,d,{img:76,ns:16,ms:13,chev:true}));s.end();
+ return s.out();}
+
+function palette(T){const s=new S(760,260,'Paleta · '+T.name,T);s.rect(0,0,760,260,{fill:'#FFFFFF',name:'Fondo'});
+ s.text(32,34,T.name,{size:28,w:800,fill:T.text});s.image(760-32-56,22,56,56,LOGO,'Logo');
+ s.wrap(T.desc,600,{size:15}).forEach((l,i)=>s.text(32,84+i*22,l,{size:15,fill:T.muted}));
+ T.sw.forEach(([c,n],i)=>{const x=32+i*142;s.g('Color '+n);s.rect(x,150,52,52,{fill:c,rx:T.rB===999?26:12,stroke:'#D5DBE1',name:'Muestra'});s.text(x,214,c,{size:13,w:800,fill:T.text});s.text(x,234,n,{size:12,fill:T.muted});s.end();});
+ return s.out();}
+
+// ---------- guía de estilo (opción A) ----------
+const STATE={'Pendiente':['#FFF4DC','#A35F00'],'Confirmada':['#E2F6EE','#0B7A55'],'Completada':['#EAF5FB','#0A7DB2'],'Cancelada':['#FDECEC','#C23A3A'],'Rechazada':['#FDECEC','#C23A3A'],'Vencida':['#EEF2F6','#4A5967'],'No asistió':['#EEF2F6','#4A5967']};
+function chip2(s,x,cy,label,bg,fg,sz=12,h=24){const tw=s.tw(label,{size:sz,w:700});s.g('Etiqueta '+label);s.rect(x,cy-h/2,tw+20,h,{fill:bg,rx:h/2,name:'Fondo'});s.mid(x+10,cy,label,{size:sz,w:700,fill:fg});s.end();return tw+20;}
+function field(s,x,y,w,label,value,st){const T=s.T;const c={normal:'#D5DDE5',foco:T.primary,error:'#C23A3A'}[st];s.g('Campo '+st);s.text(x,y,label,{size:13,w:700,fill:T.text});
+ s.rect(x,y+22,w,48,{fill:'#FFFFFF',rx:12,stroke:c,sw:st==='normal'?1:2,name:'Caja'});s.mid(x+16,y+46,value,{size:15,w:500,fill:st==='normal'?'#9AA6B2':T.text});
+ if(st==='error')s.text(x,y+82,'Escribe un correo válido',{size:12,w:600,fill:'#C23A3A'});if(st==='foco')s.text(x,y+82,'Te enviaremos un enlace para verificarlo',{size:12,fill:T.muted});s.end();}
+function bookingCard(s,x,y,w,h){const T=s.T;s.g('Tarjeta de reserva');card(s,x,y,w,h);s.rect(x+14,y+14,64,h-28,{fill:T.pill,rx:12,name:'Fecha'});s.center(x+46,y+34,'NOV',{size:11,w:800,fill:T.primary,ls:0.6});s.center(x+46,y+60,'18',{size:24,w:800,fill:T.text});
+ s.text(x+94,y+18,'Corte de cabello',{size:16,w:800,fill:T.text});s.text(x+94,y+42,'Barbería El Patrón · con Luis',{size:13,fill:T.muted});s.icon('cal',x+94,y+62,15,T.muted,2);s.text(x+114,y+64,'Martes · 10:30 a 11:00',{size:13,w:700,fill:T.text});
+ const [bg,fg]=STATE['Confirmada'];const lw=s.tw('Confirmada',{size:12,w:700})+20;chip2(s,x+w-14-lw,y+26,'Confirmada',bg,fg);s.end();}
+function guide(T){const W=1440,s=new S(W,2520,'Guia de estilo · '+T.name,T);const X=64;s.rect(0,0,W,2520,{fill:'#FFFFFF',name:'Fondo'});
+ s.image(X,52,56,56,LOGO,'Logo');s.text(X+76,58,'ReserYa · Guía de estilo',{size:34,w:800,fill:T.text});s.text(X+76,100,'Opción A · Limpio y moderno. Base para todas las pantallas de alta fidelidad.',{size:16,fill:T.muted});
+ const sect=(y,t,d)=>{s.rect(X,y-24,W-2*X,1,{fill:T.stroke,name:'Separador'});s.text(X,y,t,{size:24,w:800,fill:T.text});if(d)s.text(X,y+36,d,{size:14,fill:T.muted});};
+ const lab=(x,y,t)=>s.text(x,y,t,{size:12,w:800,fill:T.muted,upper:true,ls:0.8});
+ // colores
+ let y=176;sect(y,'Colores','Colores sólidos. El degradado azul a menta solo aparece dentro del logo, nunca en botones ni insignias.');
+ const sw=(x,y,c,n,h)=>{s.g('Color '+n);s.rect(x,y,152,76,{fill:c,rx:12,stroke:'#D5DDE5',name:'Muestra'});s.text(x,y+90,n,{size:13,w:800,fill:T.text});s.text(x,y+110,h||c,{size:12,fill:T.muted});s.end();};
+ const rows=[['Marca',[['#25A8D6','Azul del logo'],['#6DD4BF','Menta del logo'],['#0A7DB2','Primario'],['#086A99','Primario presionado'],['#EAF5FB','Primario suave']]],
+  ['Neutros',[['#0E1A26','Texto'],['#5D6B79','Texto secundario'],['#9AA6B2','Deshabilitado'],['#E3E9EF','Borde'],['#F4F7FA','Superficie'],['#FFFFFF','Fondo']]],
+  ['Estados',[['#0B7A55','Éxito'],['#E2F6EE','Éxito suave'],['#A35F00','Aviso'],['#FFF4DC','Aviso suave'],['#C23A3A','Error'],['#FDECEC','Error suave'],['#F5A524','Estrellas']]]];
+ rows.forEach(([n,cs],i)=>{const ry=y+76+i*158;lab(X,ry,n);cs.forEach(([c,nm],j)=>sw(X+j*176,ry+24,c,nm));});
+ // tipografía
+ y=760;sect(y,'Tipografía','Plus Jakarta Sans en todo el sitio. Pesos 400, 500, 700 y 800.');
+ [['Título de página','¿Qué quieres reservar hoy?',30,800],['Título de sección','Negocios recomendados',22,800],['Subtítulo','Barbería El Patrón',18,800],['Texto','Elige el servicio y la hora que te acomode.',15,500],['Texto secundario','Salón de uñas · 85 reseñas',13,400],['Etiqueta','Recomendado',11,800,true]].forEach(([n,ex,sz,w,up],i)=>{const ry=y+84+i*56;
+  s.g('Texto '+n);s.text(X,ry,ex,{size:sz,w,fill:T.text,upper:up,ls:up?0.7:0});s.text(840,ry+4,n,{size:14,w:800,fill:T.text});s.text(1040,ry+4,`${sz} px · peso ${w}${up?' · mayúsculas':''}`,{size:14,fill:T.muted});s.end();});
+ // botones
+ y=1180;sect(y,'Botones','Altura 48 en formularios, 40 en tarjetas y 32 en tarjetas chicas. Esquinas de 12.');
+ let bx=X;const by=y+84;const B1=(l,o,cap)=>{const w=btn(s,bx,by,l,{h:48,size:15,...o});s.text(bx,by+62,cap,{size:12,fill:T.muted});bx+=w+40;};
+ B1('Reservar',{px:28},'Primario');B1('Volver a agendar',{icon:'rotate'},'Primario con ícono');B1('Ver negocio',{fill:'#FFFFFF',color:T.primary,stroke:'#C7DDEA'},'Secundario');B1('Calificar',{fill:T.text},'Oscuro');B1('Reservar',{fill:'#E3E9EF',color:'#9AA6B2',px:28},'Deshabilitado');
+ s.text(bx,by+16,'Ver todo',{size:15,w:700,fill:T.primary});s.text(bx,by+62,'Enlace',{size:12,fill:T.muted});
+ bx=X;const by2=by+110;let w2=btn(s,bx,by2,'Aceptar',{h:40,size:14});s.text(bx,by2+54,'Mediano · 40',{size:12,fill:T.muted});bx+=w2+40;w2=btn(s,bx,by2+4,'Calificar',{h:32,size:13,px:14,fill:T.text});s.text(bx,by2+54,'Chico · 32',{size:12,fill:T.muted});
+ // campos
+ y=1500;sect(y,'Campos y buscador',null);field(s,X,y+60,290,'Correo','tu@correo.com','normal');field(s,X+330,y+60,290,'Correo','ana@correo.com','foco');field(s,X+660,y+60,290,'Correo','ana@correo','error');
+ lab(X+990,y+60,'Buscador');search(s,X+990,y+82,320,52,40);
+ // etiquetas
+ y=1720;sect(y,'Etiquetas',null);lab(X,y+56,'Disponibilidad');chip(s,X,y+96,'Disponible hoy',true,12,24);chip(s,X+130,y+96,'Mañana',false,12,24);
+ lab(X+320,y+56,'Insignia');badge(s,X+320,y+84,'Recomendado',11,24);
+ lab(X+560,y+56,'Filtros');s.g('Filtro activo');const fw=s.tw('Barberías',{size:13,w:700})+44;s.rect(X+560,y+80,fw,32,{fill:T.pill,rx:16,stroke:T.primary,name:'Fondo'});s.mid(X+576,y+96,'Barberías',{size:13,w:700,fill:T.primary});s.icon('x',X+560+fw-24,y+89,14,T.primary,2.4);s.end();
+ s.g('Filtro inactivo');s.rect(X+580+fw,y+80,90,32,{fill:'#FFFFFF',rx:16,stroke:'#D5DDE5',name:'Fondo'});s.mid(X+596+fw,y+96,'Masajes',{size:13,w:700,fill:T.text});s.end();
+ lab(X,y+136,'Estados de una reserva');let cx=X;Object.entries(STATE).forEach(([n,[bg,fg]])=>{cx+=chip2(s,cx,y+176,n,bg,fg)+12;});
+ // tarjetas
+ y=1990;sect(y,'Tarjetas','Fondo blanco, borde de 1 px y esquinas de 16. Sin sombras.');
+ s.g('Tarjeta reciente');card(s,X,y+70,240,176);photo(s,X+10,y+80,220,104,'bar',10);s.text(X+12,y+198,'Barbería El Patrón',{size:15,w:800,fill:T.text});s.text(X+12,y+220,'Barbería',{size:13,fill:T.muted});s.end();
+ listCard(s,X+280,y+70,420,100,FI,{img:76,ns:16,ms:13,chev:true});bookingCard(s,X+740,y+70,440,100);
+ lab(X,y+268,'Fotos');s.text(X+80,y+266,'Mientras no hay fotos reales se usa un cuadro de color sólido con el ícono de la categoría.',{size:13,fill:T.muted});
+ // navegación e íconos
+ y=2330;sect(y,'Íconos','Lucide, trazo de 2 px. En la barra de navegación: gris si no está activo y azul primario si está activo.');
+ const ICN={search:'Buscar',sliders:'Filtros',home:'Inicio',cal:'Reservas',user:'Perfil',rotate:'Reagendar',bell:'Avisos',star:'Estrella',chev:'Siguiente',x:'Cerrar',scissors:'Barbería',flag:'Canchas',smile:'Dental',leaf:'Masajes',sparkles:'Uñas',activity:'Fisio',paw:'Mascotas'};
+ Object.keys(IC).forEach((k,i)=>{const ix=X+i*74;s.icon(k,ix+14,y+70,26,i<10?T.text:T.muted,1.8);s.center(ix+27,y+120,ICN[k]||k,{size:11,fill:T.muted});});
+ s.text(X,y+150,'Interfaz en negro; los de categoría en gris porque van dentro de las fotos de ejemplo.',{size:12,fill:T.muted});
+ return s.out();}
+
+window.run=async(which='all')=>{
+ for(const f of ['Plus Jakarta Sans','Nunito'])for(const w of [400,500,600,700,800])await document.fonts.load(`${w} 20px "${f}"`);
+ const blob=await (await fetch('logo-mark-128.png')).blob();LOGO=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(blob);});
+ const files={};if(which==='all'||which==='propuestas')for(const T of [A,B]){files[`propuesta-${T.key}-paleta.svg`]=palette(T);files[`propuesta-${T.key}-celular.svg`]=mobile(T);files[`propuesta-${T.key}-computadora.svg`]=desktop(T);}
+ if(which==='all'||which==='guia')files['guia-de-estilo.svg']=guide(A);
+ if(which==='all'||which==='pantallas')Object.assign(files,PANTALLAS());
+ const out=document.getElementById('out');out.innerHTML='';const res=[];
+ for(const [n,svg] of Object.entries(files)){await fetch('/save?name='+n,{method:'POST',body:new Blob([svg],{type:'image/svg+xml'})});const d=document.createElement('div');d.id='v-'+n.replace('.svg','');const fr=document.createElement('iframe');const m=svg.match(/width="(\d+)" height="(\d+)"/);fr.width=m[1];fr.height=m[2];fr.style.border='0';fr.style.display='block';
+ fr.srcdoc='<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"><style>body{margin:0}svg{display:block}</style>'+svg;d.appendChild(fr);out.appendChild(d);res.push(n+' '+svg.length);}
+ return res;};
+</script><script src="pantallas.js"></script></body></html>
