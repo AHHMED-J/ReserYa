@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -31,8 +32,12 @@ export function ConfirmButton({ trigger, title, description, confirmLabel, onCon
               variant="destructive-solid"
               disabled={busy}
               onClick={async () => {
-                await onConfirm();
-                setOpen(false);
+                try {
+                  await onConfirm();
+                  setOpen(false);
+                } catch (e) {
+                  toast.error(e.message);
+                }
               }}
             >
               {confirmLabel}
