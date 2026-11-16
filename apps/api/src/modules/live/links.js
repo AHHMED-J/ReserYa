@@ -64,8 +64,14 @@ async function withResource(link) {
   return shape({ link, resourceName: r?.name, resourceColor: r?.color });
 }
 
+/** Links vigentes y los recursos activos (para crear uno por persona o espacio). */
 router.get('/', ...owner, async (req, res) => {
-  res.json({ links: await listLinks(req.business.id) });
+  const resourceRows = await db
+    .select({ id: resources.id, name: resources.name, color: resources.color })
+    .from(resources)
+    .where(and(eq(resources.businessId, req.business.id), eq(resources.active, true)))
+    .orderBy(asc(resources.createdAt), asc(resources.name));
+  res.json({ links: await listLinks(req.business.id), resources: resourceRows });
 });
 
 /**

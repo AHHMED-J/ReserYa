@@ -117,6 +117,10 @@ describe('links en vivo (RF-45, RF-46, RF-47)', () => {
 
     const list = await owner.get('/api/business/live-links');
     assert.deepEqual(
+      list.body.resources.map((r) => r.name),
+      ['Juan', 'Pedro'],
+    );
+    assert.deepEqual(
       list.body.links.map((l) => l.id),
       [regen.body.link.id],
     );
