@@ -142,6 +142,7 @@ export function DayGrid({
           <div
             className="pointer-events-none absolute inset-x-0 z-10 border-t-2 border-error"
             style={{ top: y(nowMin) }}
+            data-now
             aria-label={`Ahora, ${time(nowMs)}`}
           >
             <span className="absolute -top-[5px] -left-[5px] size-2 rounded-full bg-error" />
