@@ -93,6 +93,8 @@ describe('aprobar y rechazar (RF-11, RF-72)', () => {
 
     const summary = await admin.get('/api/admin/summary');
     assert.ok(summary.body.pendingCount >= 1);
+    assert.match(summary.body.oldestPendingAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    assert.ok(summary.body.freeKeysCount >= 0);
     const pending = await admin.get('/api/admin/businesses').query({ status: 'pending' });
     const row = pending.body.businesses.find((b) => b.id === reg.id);
     assert.equal(row.keyCode, reg.code);

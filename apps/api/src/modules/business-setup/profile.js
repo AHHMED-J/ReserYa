@@ -135,15 +135,13 @@ photosRouter.post('/', ownerAccess, receivePhotos, async (req, res) => {
   const keys = [];
   for (const [i, f] of files.entries()) keys.push(await saveUpload(f.buffer, `foto${exts[i]}`));
   try {
-    await db
-      .insert(businessPhotos)
-      .values(
-        keys.map((storageKey, i) => ({
-          businessId: req.business.id,
-          storageKey,
-          sortOrder: start + i,
-        })),
-      );
+    await db.insert(businessPhotos).values(
+      keys.map((storageKey, i) => ({
+        businessId: req.business.id,
+        storageKey,
+        sortOrder: start + i,
+      })),
+    );
   } catch (e) {
     await Promise.all(keys.map(deleteUpload));
     throw e;

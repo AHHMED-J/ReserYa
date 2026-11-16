@@ -85,12 +85,16 @@ const serviceFields = {
     .optional()
     .transform((s) => (s ? s : null)),
   durationMin: z.coerce
-    .number()
+    .number({ error: 'Escribe un número' })
     .int('Escribe minutos enteros')
     .min(5, 'Mínimo 5 minutos')
     .max(600, 'Máximo 10 horas'),
-  /** Precio en pesos (el formulario lo pide así); se guarda en centavos. */
-  price: v.pesosToCents,
+  /** Precio en pesos (el formulario lo pide así); se guarda en centavos. Igual que v.pesosToCents con mensajes en español. */
+  price: z.coerce
+    .number({ error: 'Escribe el precio' })
+    .nonnegative('El precio no puede ser negativo')
+    .max(1_000_000, 'Máximo $1,000,000')
+    .transform((p) => Math.round(p * 100)),
   active: z.boolean(),
   resourceIds: z.array(v.uuid).max(100),
 };

@@ -39,7 +39,8 @@ router.get('/summary', async (_req, res) => {
     await db.execute(sql`
       select
         (select count(*) from ${businesses} where status = 'pending')::int as "pendingCount",
-        (select min(created_at) from ${businesses} where status = 'pending') as "oldestPendingAt",
+        (select to_char(min(created_at) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
+          from ${businesses} where status = 'pending') as "oldestPendingAt",
         (select count(*) from ${businesses} where status = 'approved')::int as "activeCount",
         (select count(*) from ${businesses} where status = 'suspended')::int as "suspendedCount",
         (select count(*) from ${registrationKeys} where used_at is null)::int as "freeKeysCount",

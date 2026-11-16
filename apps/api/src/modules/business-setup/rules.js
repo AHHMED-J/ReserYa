@@ -37,25 +37,25 @@ const rulesOf = (b) => ({
 
 const oneOf = (options, message) =>
   z.coerce
-    .number()
+    .number({ error: 'Escribe un número' })
     .int()
     .refine((n) => options.includes(n), message);
 
 const rulesBody = z.object({
   cancellationLimitHours: z.coerce
-    .number()
+    .number({ error: 'Escribe un número' })
     .int('Escribe horas enteras')
     .min(0, 'Mínimo 0 horas')
     .max(168, 'Máximo 168 horas (una semana)'),
   minNoticeMinutes: oneOf(MIN_NOTICE_OPTIONS, 'Elige una anticipación mínima de la lista'),
   maxAdvanceDays: z.coerce
-    .number()
+    .number({ error: 'Escribe un número' })
     .int('Escribe días enteros')
     .min(1, 'Mínimo 1 día')
     .max(180, 'Máximo 180 días'),
   slotIntervalMinutes: oneOf(SLOT_INTERVAL_OPTIONS, 'Elige un intervalo de la lista'),
   bufferMinutes: z.coerce
-    .number()
+    .number({ error: 'Escribe un número' })
     .int('Escribe minutos enteros')
     .min(0, 'Mínimo 0 minutos')
     .max(60, 'Máximo 60 minutos'),
