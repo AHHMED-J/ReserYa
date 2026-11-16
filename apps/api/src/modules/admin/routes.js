@@ -237,7 +237,9 @@ const notify = (r, template, subject, paragraphs, cta) =>
 const reasonBody = z.object({
   reason: z.string().trim().min(5, 'Escribe el motivo (mínimo 5 caracteres)').max(1000),
 });
-const contactUs = 'Si tienes dudas, responde a este correo y con gusto te ayudamos.';
+/** Correo de soporte (el mismo que muestra la web en /negocio/estado). */
+export const SUPPORT_EMAIL = 'soporte@reserya.test';
+const contactUs = `Si tienes dudas, escríbenos a ${SUPPORT_EMAIL} y con gusto te ayudamos.`;
 
 router.post('/businesses/:id/approve', validate({ params: v.idParam }), async (req, res) => {
   const id = req.valid.params.id;

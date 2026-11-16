@@ -15,12 +15,14 @@ import {
   CalendarSync,
   Link2,
   Lock,
+  ListChecks,
 } from 'lucide-react';
 import { useMe, useLogout, ME_KEY } from '@/hooks/useAuth';
 import { api } from '@/lib/api';
 import { RequireAuth } from '@/components/RequireAuth';
 import { Button } from '@/components/ui/button';
 import { SideLayout } from './SideLayout';
+import { useSetup } from '@/features/business-setup/api';
 
 /** Rutas del negocio que se ven aunque no esté aprobado. */
 const OPEN_WHEN_INACTIVE = ['/negocio/estado'];
@@ -51,6 +53,10 @@ function BusinessShell() {
     refetchInterval: 30_000,
     retry: false,
   });
+
+  // Pasos de configuración que faltan (RF-71; lo da el módulo de configuración).
+  const setup = useSetup({ enabled: active, retry: false });
+  const missingSteps = setup.data?.steps.filter((s) => !s.done).length;
 
   // El modo dueño se vuelve a bloquear solo a los 5 minutos (RF-07).
   useEffect(() => {
@@ -83,6 +89,12 @@ function BusinessShell() {
             },
             { to: '/negocio/agenda', label: 'Agenda', icon: CalendarDays },
             { to: '/negocio/reservas', label: 'Reservas', icon: List },
+            {
+              to: '/negocio/configuracion',
+              label: 'Configuración',
+              icon: ListChecks,
+              count: missingSteps,
+            },
           ],
         },
         {
