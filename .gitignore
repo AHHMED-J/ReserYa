@@ -7,3 +7,6 @@ dist/
 .DS_Store
 apps/api/uploads/
 coverage/
+
+# Copias de trabajo de los agentes de Claude Code
+.claude/worktrees/
