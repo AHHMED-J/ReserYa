@@ -9,6 +9,7 @@ import { notFound } from './lib/errors.js';
 import { uploadsDir } from './lib/storage.js';
 import { router as authRouter, meRouter } from './modules/auth/routes.js';
 import { router as catalogRouter } from './modules/catalog/routes.js';
+import { router as ownerRouter } from './modules/owner/routes.js';
 import { router as adminRouter } from './modules/admin/routes.js';
 import { router as businessSetupRouter } from './modules/business-setup/routes.js';
 import { router as businessOpsRouter } from './modules/business-ops/routes.js';
@@ -38,6 +39,7 @@ export function createApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/me', meRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/business/owner', ownerRouter);
   app.use('/api/business', businessSetupRouter);
   app.use('/api/business', businessOpsRouter);
   app.use('/api/public', publicRouter);

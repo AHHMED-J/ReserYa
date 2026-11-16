@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import rateLimit from 'express-rate-limit';
 import { OAuth2Client } from 'google-auth-library';
 import { db } from '../../db/index.js';
-import { users, sessions } from '../../db/schema.js';
+import { users, sessions, businesses } from '../../db/schema.js';
 import { env } from '../../config/env.js';
 import { validate } from '../../middleware/validate.js';
 import { requireAuth } from '../../middleware/auth.js';
@@ -38,7 +38,9 @@ export async function sendVerificationEmail(user) {
     subject: 'Confirma tu correo en ReserYa',
     html: emailLayout({
       title: `Hola, ${user.firstName}`,
-      paragraphs: ['Confirma tu correo para poder reservar en ReserYa. El enlace vence en 48 horas.'],
+      paragraphs: [
+        'Confirma tu correo para poder reservar en ReserYa. El enlace vence en 48 horas.',
+      ],
       cta: { label: 'Confirmar mi correo', url },
     }),
     text: `Confirma tu correo: ${url}`,
@@ -65,7 +67,14 @@ router.post('/register', loginLimiter, validate({ body: registerBody }), async (
   if (exists) throw conflict('email_taken', 'Ya existe una cuenta con ese correo');
   const [user] = await db
     .insert(users)
-    .values({ role: 'client', firstName, lastName, email, phone, passwordHash: await hashSecret(password) })
+    .values({
+      role: 'client',
+      firstName,
+      lastName,
+      email,
+      phone,
+      passwordHash: await hashSecret(password),
+    })
     .returning();
   await sendVerificationEmail(user);
   await createSession(res, req, user.id);
@@ -84,7 +93,11 @@ router.post('/login', loginLimiter, validate({ body: loginBody }), async (req, r
     throw new HttpError(401, 'invalid_credentials', 'Correo o contraseña incorrectos');
   }
   await createSession(res, req, user.id);
-  res.json({ user: publicUser(user) });
+  const [business] =
+    user.role === 'business'
+      ? await db.select().from(businesses).where(eq(businesses.userId, user.id))
+      : [];
+  res.json({ user: publicUser(user, business) });
 });
 
 router.post('/logout', async (req, res) => {
@@ -196,7 +209,10 @@ router.get('/google/callback', async (req, res) => {
 
   const client = googleClient();
   const { tokens } = await client.getToken(String(req.query.code));
-  const ticket = await client.verifyIdToken({ idToken: tokens.id_token, audience: env.GOOGLE_CLIENT_ID });
+  const ticket = await client.verifyIdToken({
+    idToken: tokens.id_token,
+    audience: env.GOOGLE_CLIENT_ID,
+  });
   const p = ticket.getPayload();
   if (!p?.email || !p.email_verified) return fail('google_failed');
   const email = p.email.toLowerCase();
