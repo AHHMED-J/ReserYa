@@ -34,12 +34,13 @@ export function ClientLayout() {
       >
         <Outlet />
       </main>
-      {!hideNav && <BottomNav />}
+      {!hideNav && <BottomNav signedIn={Boolean(user)} />}
     </div>
   );
 }
 
-function BottomNav() {
+/** Sin sesión no hay Reservas ni Volver a agendar: solo Inicio, Buscar y Perfil. */
+function BottomNav({ signedIn }) {
   const tab = (to, label, Icon, end) => (
     <NavLink
       to={to}
@@ -63,14 +64,16 @@ function BottomNav() {
       <div className="relative mx-auto flex h-[70px] max-w-md items-center justify-around px-2">
         {tab('/', 'Inicio', House, true)}
         {tab('/buscar', 'Buscar', Search)}
-        <Link
-          to="/volver-a-agendar"
-          aria-label="Volver a agendar"
-          className="-mt-8 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_6px_14px_rgba(10,74,107,0.25)]"
-        >
-          <RotateCcw className="size-6" />
-        </Link>
-        {tab('/reservas', 'Reservas', CalendarDays)}
+        {signedIn && (
+          <Link
+            to="/volver-a-agendar"
+            aria-label="Volver a agendar"
+            className="-mt-8 flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_6px_14px_rgba(10,74,107,0.25)]"
+          >
+            <RotateCcw className="size-6" />
+          </Link>
+        )}
+        {signedIn && tab('/reservas', 'Reservas', CalendarDays)}
         {tab('/perfil', 'Perfil', User)}
       </div>
     </nav>
@@ -113,13 +116,17 @@ function DesktopHeader({ user }) {
           <NavLink to="/" end className={link}>
             Inicio
           </NavLink>
-          <NavLink to="/reservas" className={link}>
-            Mis reservas
-          </NavLink>
+          {user && (
+            <NavLink to="/reservas" className={link}>
+              Mis reservas
+            </NavLink>
+          )}
         </nav>
-        <ButtonLink to="/volver-a-agendar">
-          <RotateCcw /> Volver a agendar
-        </ButtonLink>
+        {user && (
+          <ButtonLink to="/volver-a-agendar">
+            <RotateCcw /> Volver a agendar
+          </ButtonLink>
+        )}
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger
@@ -140,9 +147,7 @@ function DesktopHeader({ user }) {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <ButtonLink to="/entrar" variant="outline">
-            Iniciar sesión
-          </ButtonLink>
+          <ButtonLink to="/entrar">Iniciar sesión</ButtonLink>
         )}
       </div>
     </header>

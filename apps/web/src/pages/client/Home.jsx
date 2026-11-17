@@ -32,10 +32,14 @@ export default function Home() {
   return (
     <div className="space-y-7">
       <header>
-        <Logo size="md" className="mb-4 md:hidden" />
-        <p className="text-[15px] text-muted-foreground">
-          {user ? `Hola, ${user.firstName}` : 'Hola'}
-        </p>
+        <div className="mb-4 flex items-center justify-between md:hidden">
+          <Logo size="md" />
+          {!user && (
+            <ButtonLink to="/entrar" size="sm">
+              Iniciar sesión
+            </ButtonLink>
+          )}
+        </div>
         <h1 className="text-[26px] leading-tight font-extrabold tracking-tight md:text-[30px]">
           ¿Qué quieres reservar hoy?
         </h1>
@@ -73,7 +77,7 @@ export default function Home() {
               </section>
             )
           ) : (
-            <Welcome signedIn={Boolean(user)} />
+            <Welcome />
           )}
 
           {returning && data.reviewPrompt ? (
@@ -108,7 +112,7 @@ export default function Home() {
 }
 
 /** RF-62: sin sesión o sin reservas todavía. */
-function Welcome({ signedIn }) {
+function Welcome() {
   return (
     <section className="rounded-xl border border-primary-line bg-primary-soft p-5 md:flex md:items-center md:justify-between md:gap-6 md:p-7">
       <div>
@@ -127,11 +131,6 @@ function Welcome({ signedIn }) {
         <ButtonLink to="/buscar">
           <Search /> Buscar negocios
         </ButtonLink>
-        {!signedIn && (
-          <ButtonLink to="/entrar" variant="outline-primary">
-            Iniciar sesión
-          </ButtonLink>
-        )}
       </div>
     </section>
   );
