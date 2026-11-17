@@ -248,22 +248,16 @@ function ServiceDialog({ service, resources, onClose }) {
                 onChange={set('durationMin')}
               />
             </Field>
-            <Field label="Precio (MXN)" error={fieldError(err, 'price')}>
-              <div className="relative">
-                <span className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-[15px] font-bold text-muted-foreground">
-                  $
-                </span>
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  min={0}
-                  step="0.01"
-                  value={f.price}
-                  onChange={set('price')}
-                  placeholder="200"
-                  className="pl-8"
-                />
-              </div>
+            <Field label="Precio en pesos (MXN)" error={fieldError(err, 'price')}>
+              <Input
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step="0.01"
+                value={f.price}
+                onChange={set('price')}
+                placeholder="200"
+              />
             </Field>
           </div>
           <fieldset>

@@ -72,22 +72,19 @@ function RulesForm({ rules }) {
 
       <Section title="Cancelación">
         <Field
-          label="Tus clientes pueden cancelar hasta"
+          label="Tus clientes pueden cancelar hasta (horas antes de la cita)"
           error={fieldError(err, 'cancellationLimitHours')}
           hint={`Hasta ${f.cancellationLimitHours || 0} h antes de la cita con reembolso completo. Después ya no pueden cancelar.`}
         >
-          <div className="flex items-center gap-3">
-            <Input
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={168}
-              value={f.cancellationLimitHours}
-              onChange={num('cancellationLimitHours')}
-              className="w-28"
-            />
-            <span className="text-sm font-semibold text-muted-foreground">horas antes</span>
-          </div>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={168}
+            value={f.cancellationLimitHours}
+            onChange={num('cancellationLimitHours')}
+            className="w-28"
+          />
         </Field>
       </Section>
 
@@ -112,22 +109,19 @@ function RulesForm({ rules }) {
             </p>
           </div>
           <Field
-            label="Anticipación máxima"
+            label="Anticipación máxima (días)"
             error={fieldError(err, 'maxAdvanceDays')}
             hint="Hasta cuántos días en el futuro se puede reservar (de 1 a 180)."
           >
-            <div className="flex items-center gap-3">
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={180}
-                value={f.maxAdvanceDays}
-                onChange={num('maxAdvanceDays')}
-                className="w-28"
-              />
-              <span className="text-sm font-semibold text-muted-foreground">días</span>
-            </div>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={180}
+              value={f.maxAdvanceDays}
+              onChange={num('maxAdvanceDays')}
+              className="w-28"
+            />
           </Field>
         </div>
       </Section>
@@ -153,23 +147,20 @@ function RulesForm({ rules }) {
             </p>
           </div>
           <Field
-            label="Tiempo libre entre citas"
+            label="Tiempo libre entre citas (minutos)"
             error={fieldError(err, 'bufferMinutes')}
             hint="Para limpiar o preparar el lugar. De 0 a 60 minutos."
           >
-            <div className="flex items-center gap-3">
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={0}
-                max={60}
-                step={5}
-                value={f.bufferMinutes}
-                onChange={num('bufferMinutes')}
-                className="w-28"
-              />
-              <span className="text-sm font-semibold text-muted-foreground">minutos</span>
-            </div>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={60}
+              step={5}
+              value={f.bufferMinutes}
+              onChange={num('bufferMinutes')}
+              className="w-28"
+            />
           </Field>
         </div>
       </Section>
