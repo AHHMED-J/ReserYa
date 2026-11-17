@@ -1,10 +1,13 @@
 // Datos de demostración. Uso: pnpm db:seed (o pnpm db:reset para empezar de cero).
 // Cuentas: ver README (todas con la contraseña demo1234 y el PIN de dueño 1234).
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { sql } from 'drizzle-orm';
 import { db, pool } from '../index.js';
 import * as s from '../schema.js';
 import { hashSecret, registrationCode } from '../../lib/crypto.js';
 import { now } from '../../lib/time.js';
+import { uploadsDir } from '../../lib/storage.js';
 import {
   CATEGORIES,
   BUSINESSES,
@@ -71,6 +74,36 @@ const clients = await db
 const client = Object.fromEntries(clients.map((c) => [c.firstName, c]));
 
 // ---------- negocios ----------
+// Fotos de demostración: src/db/seed/fotos/<nombre-del-negocio>/1.jpg, 2.jpg, 3.jpg (la 1 es la
+// principal). Si la carpeta no existe o está vacía, el negocio queda sin fotos y la web muestra el
+// ícono de su categoría. Los archivos se copian con nombre fijo para que repetir el seed no acumule.
+const FOTOS_DIR = new URL('./fotos/', import.meta.url);
+const slugify = (name) =>
+  name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+async function attachPhotos(business) {
+  const slug = slugify(business.name);
+  let files;
+  try {
+    files = (await fs.readdir(new URL(`${slug}/`, FOTOS_DIR))).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).sort();
+  } catch {
+    return;
+  }
+  if (!files.length) return;
+  await fs.mkdir(uploadsDir, { recursive: true });
+  for (const [i, file] of files.entries()) {
+    const key = `seed-${slug}-${i + 1}${path.extname(file).toLowerCase()}`;
+    await fs.copyFile(new URL(`${slug}/${file}`, FOTOS_DIR), path.join(uploadsDir, key));
+    await db.insert(s.businessPhotos).values({ businessId: business.id, storageKey: key, sortOrder: i });
+  }
+}
+
 async function createBusinessAccount(def, status) {
   const [key] = await db
     .insert(s.registrationKeys)
@@ -106,6 +139,7 @@ async function createBusinessAccount(def, status) {
       createdAt: T.minus({ days: status === 'pending' ? 1 + PENDING_BUSINESSES.indexOf(def) : 40 }).toJSDate(),
     })
     .returning();
+  await attachPhotos(business);
   return business;
 }
 
