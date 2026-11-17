@@ -1,0 +1,57 @@
+Fuentes de las fotos de demostración.
+
+Pexels (licencia gratuita de Pexels: uso libre, personal y comercial, sin atribución obligatoria,
+aunque se agradece). La foto está en https://www.pexels.com/photo/<id>/
+
+cancha-la-10/1.jpg            Pexels 32090925
+cancha-la-10/2.jpg            Pexels 186239
+cancha-la-10/3.jpg            Pexels 12039814
+futbolito-el-sauzal/1.jpg     Pexels 15818644
+futbolito-el-sauzal/2.jpg     Pexels 37097046
+futbolito-el-sauzal/3.jpg     Pexels 40329031
+peludos-felices/1.jpg         Pexels 19145879
+peludos-felices/2.jpg         Pexels 6131580
+peludos-felices/3.jpg         Pexels 19145874
+patitas-spa/1.jpg             Pexels 1436139
+patitas-spa/2.jpg             Pexels 6131161
+patitas-spa/3.jpg             Pexels 28730603
+dental-sonrisa/1.jpg          Pexels 3952130
+dental-sonrisa/2.jpg          Pexels 8413334
+dental-sonrisa/3.jpg          Pexels 305567
+clinica-dental-bahia/1.jpg    Pexels 6812558
+clinica-dental-bahia/2.jpg    Pexels 7800675
+clinica-dental-bahia/3.jpg    Pexels 9062525
+profe-en-casa/1.jpg           Pexels 7079148
+profe-en-casa/2.jpg           Pexels 8798898
+profe-en-casa/3.jpg           Pexels 5311406
+academia-pacifico/1.jpg       Pexels 4173339
+academia-pacifico/2.jpg       Pexels 6502728
+academia-pacifico/3.jpg       Pexels 7970134
+nutrivida/1.jpg               Pexels 15319047
+nutrivida/2.jpg               Pexels 15319016
+nutrivida/3.jpg               Pexels 8844387
+balance-nutricion/1.jpg       Pexels 15319021
+balance-nutricion/2.jpg       Pexels 15319019
+balance-nutricion/3.jpg       Pexels 8844553
+spa-brisa/1.jpg               Pexels 19666194
+spa-brisa/2.jpg               Pexels 6187418
+spa-brisa/3.jpg               Pexels 19641816
+masajes-ensenada/1.jpg        Pexels 18120174
+masajes-ensenada/2.jpg        Pexels 6628649
+masajes-ensenada/3.jpg        Pexels 37719545
+fisio-activa/1.jpg            Pexels 20860596
+fisio-activa/2.jpg            Pexels 20860588
+fisio-activa/3.jpg            Pexels 4506073
+rehabilita-centro/1.jpg       Pexels 20860621
+rehabilita-centro/2.jpg       Pexels 6111589
+rehabilita-centro/3.jpg       Pexels 30483061
+barberia-el-patron/3.jpg      Pexels 7447152
+corte-fino/2.jpg              Pexels 7518732
+corte-fino/3.jpg              Pexels 4422102
+unas-glam/3.jpg               Pexels 34930138
+nails-and-co/3.jpg            Pexels 34930123
+
+Fotos que aportó el autor desde sus descargas (origen y licencia sin verificar):
+
+barberia-el-patron/1.jpg, barberia-el-patron/2.jpg, corte-fino/1.jpg,
+unas-glam/1.jpg, unas-glam/2.jpg, nails-and-co/1.jpg, nails-and-co/2.jpg
