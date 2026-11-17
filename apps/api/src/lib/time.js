@@ -24,7 +24,7 @@ export const toLocal = (jsDate) => DateTime.fromJSDate(jsDate).setZone(APP_TZ);
 /** "mié 18 nov · 16:00" */
 export const formatShort = (jsDate) => toLocal(jsDate).toFormat("ccc d LLL '·' HH:mm");
 /** "miércoles 18 de noviembre, 16:00" */
-export const formatLong = (jsDate) => toLocal(jsDate).toFormat("cccc d 'de' LLLL', ' HH:mm");
+export const formatLong = (jsDate) => toLocal(jsDate).toFormat("cccc d 'de' LLLL', 'HH:mm");
 
 export const formatMoney = (cents) =>
   new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(cents / 100);
