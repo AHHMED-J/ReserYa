@@ -3,6 +3,7 @@ import { ClientLayout } from '@/components/layout/ClientLayout';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { BusinessLayout } from '@/components/layout/BusinessLayout';
 import { OwnerGate } from '@/components/layout/OwnerGate';
+import { BusinessHome } from '@/components/layout/BusinessHome';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { clientRoutes } from '@/routes/client';
 import {
@@ -59,7 +60,7 @@ export const router = createBrowserRouter([
         path: '/negocio',
         element: <BusinessLayout />,
         children: [
-          { index: true, element: <Navigate to="/negocio/solicitudes" replace /> },
+          { index: true, element: <BusinessHome /> },
           ...businessSetupRoutes,
           ...receptionRoutes,
           {
