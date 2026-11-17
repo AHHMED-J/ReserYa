@@ -16,7 +16,8 @@ const client = (el) => <RequireAuth roles={['client']}>{el}</RequireAuth>;
 export const clientRoutes = [
   { index: true, element: <Home /> },
   { path: 'buscar', element: <Search /> },
-  { path: 'negocios/:id', element: <BusinessProfile /> },
+  // El perfil tiene su propia barra de "Reservar" abajo (pantalla 04).
+  { path: 'negocios/:id', element: <BusinessProfile />, handle: { hideNav: true } },
   { path: 'negocios/:id/reservar', element: client(<BookingFlow />), handle: { hideNav: true } },
   { path: 'reservas', element: client(<MyBookings />) },
   { path: 'reservas/:id', element: client(<BookingDetail />) },
