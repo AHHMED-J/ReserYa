@@ -49,13 +49,14 @@ export default function BookingFlow() {
   const { id } = useParams();
   const { user } = useMe();
   const q = useBusiness(id);
+  const next = encodeURIComponent(`/negocios/${id}/reservar`);
   if (!user.emailVerified)
     return (
       <Gate
         icon={MailWarning}
         title="Verifica tu correo para reservar"
         text="Te mandamos un enlace a tu correo. Ábrelo para confirmar tu cuenta y vuelve aquí."
-        action={{ label: 'Verificar mi correo', to: '/verificar-correo' }}
+        action={{ label: 'Verificar mi correo', to: `/verificar-correo?next=${next}` }}
       />
     );
   if (!user.profileComplete)
@@ -64,7 +65,7 @@ export default function BookingFlow() {
         icon={PhoneMissed}
         title="Agrega tu teléfono para reservar"
         text="El negocio lo necesita por si hay algún cambio con tu cita."
-        action={{ label: 'Agregar teléfono', to: '/completar-perfil' }}
+        action={{ label: 'Agregar teléfono', to: `/completar-perfil?next=${next}` }}
       />
     );
   if (q.isLoading) return <FullPageSpinner />;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, fieldError } from '@/lib/api';
 import { useMe, ME_KEY } from '@/hooks/useAuth';
@@ -20,6 +20,7 @@ export default function CompleteProfile() {
 function Form() {
   const { user } = useMe();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
   const qc = useQueryClient();
   const [f, setF] = useState({
     firstName: user.firstName ?? '',
@@ -30,7 +31,8 @@ function Form() {
     mutationFn: (body) => api('/me', { method: 'PATCH', body }),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ME_KEY });
-      navigate('/', { replace: true });
+      const next = params.get('next');
+      navigate(next?.startsWith('/') && !next.startsWith('//') ? next : '/', { replace: true });
     },
   });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
