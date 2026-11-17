@@ -132,6 +132,7 @@ for (const def of BUSINESSES) {
         title,
         kind,
         color: RES_COLORS[i % RES_COLORS.length],
+        createdAt: T.minus({ days: 40 }).plus({ seconds: i }).toJSDate(), // conserva el orden
       })),
     )
     .returning();
