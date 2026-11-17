@@ -20,6 +20,7 @@ async function loadForEmail(bookingId) {
       ownerId: owner.id,
       serviceName: services.name,
       resourceName: resources.name,
+      resourceKind: resources.kind,
       client: users,
     })
     .from(bookings)
@@ -32,6 +33,9 @@ async function loadForEmail(bookingId) {
   return row;
 }
 
+/** "con Juan" para personas, "en Cancha 1" para espacios. */
+const withRes = (r) =>
+  r.resourceKind === 'space' ? `en ${r.resourceName}` : `con ${r.resourceName}`;
 const clientName = (c) => `${c.firstName} ${c.lastName}`.trim();
 
 /** Al negocio, cuando una solicitud entra a su cola (RF-50). */
@@ -41,7 +45,7 @@ export async function sendNewRequestEmail(bookingId) {
   const b = r.booking;
   const url = `${env.WEB_URL}/negocio/solicitudes`;
   const paragraphs = [
-    `${clientName(r.client)} solicitó ${r.serviceName} con ${r.resourceName} el ${formatLong(b.startsAt)} (${formatMoney(b.priceCents)}).`,
+    `${clientName(r.client)} solicitó ${r.serviceName} ${withRes(r)} el ${formatLong(b.startsAt)} (${formatMoney(b.priceCents)}).`,
     `Tienes hasta el ${formatShort(b.respondBy)} para aceptarla o rechazarla. Si no respondes, la solicitud vence y se libera el pago del cliente.`,
   ];
   await sendEmail({
@@ -66,7 +70,7 @@ export async function sendBookingConfirmedEmail(bookingId) {
   const b = r.booking;
   const url = `${env.WEB_URL}/reservas/${bookingId}`;
   const paragraphs = [
-    `Tu cita de ${r.serviceName} con ${r.resourceName} en ${r.businessName} quedó confirmada para el ${formatLong(b.startsAt)}.`,
+    `Tu cita en ${r.businessName} quedó confirmada: ${r.serviceName} ${withRes(r)}, el ${formatLong(b.startsAt)}.`,
     r.businessAddress ? `Dirección: ${r.businessAddress}.` : null,
     `Se cobró ${formatMoney(b.priceCents)} a tu tarjeta.`,
   ].filter(Boolean);
@@ -93,11 +97,11 @@ export async function sendCancelledByClientEmail(bookingId, { wasConfirmed }) {
   const url = `${env.WEB_URL}/negocio/reservas`;
   const paragraphs = wasConfirmed
     ? [
-        `${clientName(r.client)} canceló su cita de ${r.serviceName} con ${r.resourceName} del ${formatLong(b.startsAt)}.`,
+        `${clientName(r.client)} canceló su cita de ${r.serviceName} ${withRes(r)} del ${formatLong(b.startsAt)}.`,
         'El horario quedó libre otra vez y el cliente recibe el reembolso completo.',
       ]
     : [
-        `${clientName(r.client)} retiró su solicitud de ${r.serviceName} con ${r.resourceName} para el ${formatLong(b.startsAt)}.`,
+        `${clientName(r.client)} retiró su solicitud de ${r.serviceName} ${withRes(r)} para el ${formatLong(b.startsAt)}.`,
         'Ya no aparece en tu cola de solicitudes.',
       ];
   await sendEmail({
