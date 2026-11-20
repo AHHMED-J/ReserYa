@@ -22,8 +22,10 @@ import ForgotPassword from '@/pages/auth/ForgotPassword';
 import ResetPassword from '@/pages/auth/ResetPassword';
 import Legal from '@/pages/legal/Legal';
 import NotFound from '@/pages/NotFound';
+import { useRouteTitle } from '@/lib/pageTitle';
 
 function Root() {
+  useRouteTitle();
   return (
     <>
       <ScrollRestoration />

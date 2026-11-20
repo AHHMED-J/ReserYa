@@ -21,6 +21,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { agoText, duration, money, moneyMXN, phone } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { useBusiness, useBusinessReviews } from '@/features/client/queries';
+import { usePageTitle } from '@/lib/pageTitle';
 import { NextSlotChip, PolicyNotice, mapsUrl, slotLabel } from '@/features/client/components';
 
 const WEEK = [
@@ -38,6 +39,7 @@ const rangesText = (ranges) => ranges.map(([s, e]) => `${h(s)} a ${h(e)}`).join(
 export default function BusinessProfile() {
   const { id } = useParams();
   const q = useBusiness(id);
+  usePageTitle(q.data?.name);
   if (q.isLoading) return <FullPageSpinner />;
   if (q.isError)
     return q.error.status === 404 ? (
