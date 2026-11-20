@@ -27,7 +27,10 @@ export function ClientLayout() {
     <div className="min-h-dvh bg-background">
       <DesktopHeader user={user} />
       <main
+        id="contenido"
+        tabIndex={-1}
         className={cn(
+          'outline-none',
           'mx-auto w-full max-w-[1280px] px-4 pt-4 md:px-12 md:pt-6 md:pb-12',
           hideNav ? 'pb-28' : 'pb-28',
         )}

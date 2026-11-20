@@ -44,7 +44,11 @@ export function SideLayout({ tag, home, groups, footer, topRight }) {
           {nav}
         </SheetContent>
       </Sheet>
-      <main className="min-w-0 flex-1 px-4 py-5 md:px-10 md:py-8">
+      <main
+        id="contenido"
+        tabIndex={-1}
+        className="min-w-0 flex-1 px-4 py-5 outline-none md:px-10 md:py-8"
+      >
         <Outlet />
       </main>
     </div>
