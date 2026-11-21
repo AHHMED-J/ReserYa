@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReserYa · Guía del proyecto</title>
+<style>
+  :root {
+    --bg: #F4F7FA; --card: #FFFFFF; --text: #0E1A26; --muted: #5D6B79; --line: #E3E9EF;
+    --primary: #0A7DB2; --primary-soft: #E3F2F9; --ok: #1B7F4B; --ok-soft: #E4F4EA;
+    --warn: #9A6200; --warn-soft: #FFF3D6; --bad: #B3261E; --bad-soft: #FBE9E7;
+    --api: #E8F0FE; --web: #E3F2F9; --db: #EAF6EC; --ext: #FFF3D6; --job: #F1ECFA;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; }
+  code { background: #EEF2F6; padding: 1px 6px; border-radius: 6px; color: #0B3B57; white-space: nowrap; }
+  a { color: var(--primary); }
+  .layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 28px;
+    max-width: 1280px; margin: 0 auto; padding: 24px 16px 80px; }
+  nav.side { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+  nav.side b { display: block; font-size: 18px; margin-bottom: 8px; }
+  nav.side a { display: block; padding: 6px 8px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: 14px; }
+  nav.side a:hover { background: var(--primary-soft); }
+  main { min-width: 0; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  h2 { font-size: 22px; margin: 44px 0 6px; padding-top: 6px; }
+  h3 { font-size: 17px; margin: 22px 0 6px; }
+  p.lead { color: var(--muted); margin: 0 0 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin: 12px 0; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
+  .ok { background: var(--ok-soft); color: var(--ok); }
+  .warn { background: var(--warn-soft); color: var(--warn); }
+  .bad { background: var(--bad-soft); color: var(--bad); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  th { background: #EEF3F7; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  tr:last-child td { border-bottom: 0; }
+  .scroll { overflow-x: auto; }
+  .scroll table { min-width: 640px; }
+  .diagram { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px; overflow-x: auto; }
+  .diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+  svg text { font: 13px system-ui, sans-serif; fill: #0E1A26; }
+  svg .t-small { font-size: 11.5px; fill: #5D6B79; }
+  svg .t-bold { font-weight: 700; }
+  svg .box { stroke: #9FB3C4; stroke-width: 1.4; rx: 12; }
+  svg .arrow { stroke: #4A5D6E; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+  svg .arrow-d { stroke: #4A5D6E; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; marker-end: url(#ah); }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 8px 0; }
+  .steps li { counter-increment: s; position: relative; padding: 10px 12px 10px 46px; margin: 8px 0;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  .steps li::before { content: counter(s); position: absolute; left: 12px; top: 10px; width: 24px; height: 24px;
+    border-radius: 50%; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; }
+  .where { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+  input.search { width: 100%; padding: 12px 14px; font-size: 16px; border: 2px solid var(--line);
+    border-radius: 12px; background: #fff; color: var(--text); }
+  input.search:focus { outline: none; border-color: var(--primary); }
+  .tree { font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .tree .c { color: var(--muted); }
+  .tag { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin-right: 6px; }
+  .tag.api { background: var(--api); color: #1A3E8C; } .tag.web { background: var(--web); color: #0B5F85; }
+  .tag.db { background: var(--db); color: #1B6B3A; } .tag.ext { background: var(--ext); color: #7A4F00; }
+  .tag.job { background: var(--job); color: #5B3BA0; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin: 8px 0; }
+  summary { cursor: pointer; font-weight: 700; }
+  ul.tight { margin: 6px 0; padding-left: 20px; } ul.tight li { margin: 3px 0; }
+  .banner { border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
+  .banner.bad { background: var(--bad-soft); color: #5F1410; border: 1px solid #F2C4BF; }
+  .banner.warn { background: var(--warn-soft); color: #4D3200; border: 1px solid #EBCF8F; }
+  @media (max-width: 880px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.side { position: static; max-height: none; display: flex; flex-wrap: wrap; gap: 4px; }
+    nav.side b { width: 100%; }
+    h1 { font-size: 25px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="side" aria-label="Secciones">
+  <b>ReserYa</b>
+  <a href="#entrega">1. Entrega y puntos</a>
+  <a href="#arquitectura">2. Arquitectura</a>
+  <a href="#carpetas">3. Carpetas</a>
+  <a href="#buscador">4. ¿Dónde vive…?</a>
+  <a href="#flujos">5. Flujos paso a paso</a>
+  <a href="#estados">6. Estados de una reserva</a>
+  <a href="#bd">7. Base de datos</a>
+  <a href="#rutas">8. Pantallas y API</a>
+  <a href="#seguridad">9. Seguridad</a>
+  <a href="#limites">10. Casos límite</a>
+  <a href="#ia">11. Cambio en vivo con IA</a>
+  <a href="#criterio">12. Criterio y bitácora</a>
+  <a href="#comandos">13. Comandos</a>
+</nav>
+
+<main>
+<h1>ReserYa · Guía para entender y defender el proyecto</h1>
+<p class="lead">Plataforma de reservas para negocios de Ensenada (barberías, canchas, consultorios…). Todo lo de abajo sale del código real: cada archivo y número de línea se verificó el 21 de noviembre de 2026 (commit <code>1068ee4</code>). Si editas el código, las líneas se pueden mover unas posiciones; busca por nombre de función.</p>
+
+<div class="card">
+  <b>Resumen en 60 segundos</b>
+  <ul class="tight">
+    <li><b>Qué es:</b> un cliente busca un negocio, elige servicio, persona o espacio y horario, y paga con tarjeta. El dinero solo se <i>aparta</i>; se cobra cuando el negocio acepta. El negocio ve solicitudes y agenda, y la sincroniza con Google Calendar. Un administrador aprueba negocios.</li>
+    <li><b>Tres roles:</b> <code>client</code>, <code>business</code>, <code>admin</code> (enum <code>user_role</code> en <code>schema.js</code>). Dentro del negocio hay "recepción" (sin PIN) y "dueño" (con PIN).</li>
+    <li><b>Dos apps en un monorepo pnpm:</b> <code>apps/web</code> (React 19 + Vite) y <code>apps/api</code> (Node + Express 5 + Drizzle + PostgreSQL).</li>
+    <li><b>Tres servicios externos, todos opcionales:</b> Stripe (pagos), Google (login y Calendar), SMTP (correos). Sin llaves, la app cae a pago simulado y correos en consola.</li>
+    <li><b>Idea que más te van a preguntar:</b> el horario <i>no</i> se protege solo en el código; <b>PostgreSQL mismo impide empalmar dos reservas</b> (restricción de exclusión, <code>drizzle/0001_exclusion.sql</code>).</li>
+  </ul>
+</div>
+
+<!-- ============ 1. ENTREGA ============ -->
+<h2 id="entrega">1. Entrega y puntos: lo que pide el profe</h2>
+<p class="lead">Entrega: <b>domingo 22 de noviembre, 11:59 pm</b>. Se califica el último commit antes de esa hora. Sin entrega no presentas.</p>
+<div class="scroll"><table>
+  <tr><th>Requisito</th><th>Estado</th><th>Detalle</th></tr>
+  <tr><td>Liga al repositorio de GitHub</td><td><span class="pill ok">Listo</span></td><td><code>https://github.com/AHHMED-J/ReserYa</code>. Último commit publicado: <code>1068ee4</code>. No subas nada que rompa el proyecto antes del domingo.</td></tr>
+  <tr><td><b>Bitácora de IA y diario de decisiones dentro del repositorio</b></td><td><span class="pill bad">Falta</span></td><td>No existe en el repo (solo está <code>docs/base-de-datos.md</code>). Es <b>obligatoria</b> y sin ella no presentas. Además alimenta 4 pts (criterio) y 2 pts (proceso). Es lo primero que hay que resolver.</td></tr>
+  <tr><td>Liga al proyecto desplegado (si hay)</td><td><span class="pill warn">Decidir</span></td><td>No hay despliegue. La tarea dice "en caso de contar con despliegue", pero la presentación habla de "la versión desplegada". Pregunta al profe si basta correrlo en tu laptop.</td></tr>
+  <tr><td>Producto funcionando (4 pts, incluye caso límite)</td><td><span class="pill ok">Listo</span> <span class="pill warn">repasar</span></td><td>107 pruebas automáticas de la API pasan. Google y Stripe están verificados con cuentas reales de prueba. Falta que tú intentes romper la app (sección 10).</td></tr>
+  <tr><td>Mapa del sistema (4 pts)</td><td><span class="pill warn">Estudiar</span></td><td>Esta guía. Practica con el buscador de la sección 4.</td></tr>
+  <tr><td>Cambio en vivo con IA (6 pts)</td><td><span class="pill warn">Preparar</span></td><td>Herramienta de IA abierta, con sesión iniciada y con acceso al proyecto. Ver sección 11.</td></tr>
+  <tr><td>Criterio y decisiones (4 pts)</td><td><span class="pill warn">Depende de la bitácora</span></td><td>Lo que digas debe coincidir con la bitácora. Ver sección 12.</td></tr>
+  <tr><td>Proceso: commits incrementales (2 pts)</td><td><span class="pill ok">Listo</span></td><td>55 commits en 5 días (13, 16, 19, 20 y 21 de nov), mensajes descriptivos en español.</td></tr>
+</table></div>
+<div class="banner bad"><b>Hueco más importante:</b> falta la bitácora de IA y el diario de decisiones en el repo. Hay que escribirlos y subirlos antes del domingo 11:59 pm, y deben ser honestos y tuyos (qué te propuso la IA, qué rechazaste, en qué se equivocó).</div>
+
+<!-- ============ 2. ARQUITECTURA ============ -->
+<h2 id="arquitectura">2. Arquitectura: quién habla con quién</h2>
+<p class="lead">Una petición típica: el navegador llama a <code>/api/...</code>; el servidor de Vite la reenvía a Express; Express valida, consulta PostgreSQL y responde JSON.</p>
+<div class="diagram">
+<svg viewBox="0 0 960 470" role="img" aria-label="Diagrama de arquitectura">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4A5D6E"/></marker></defs>
+
+  <rect class="box" x="20" y="30" width="230" height="120" fill="#E3F2F9"/>
+  <text class="t-bold" x="38" y="56">Navegador · React</text>
+  <text class="t-small" x="38" y="76">apps/web (puerto 5173)</text>
+  <text class="t-small" x="38" y="96">main.jsx → router.jsx</text>
+  <text class="t-small" x="38" y="114">pages/ + features/ + components/</text>
+  <text class="t-small" x="38" y="132">lib/api.js (fetch + cookie)</text>
+
+  <rect class="box" x="320" y="50" width="170" height="80" fill="#F4F7FA"/>
+  <text class="t-bold" x="338" y="76">Proxy de Vite</text>
+  <text class="t-small" x="338" y="96">/api y /uploads → :4000</text>
+  <text class="t-small" x="338" y="114">vite.config.js</text>
+
+  <rect class="box" x="560" y="20" width="380" height="250" fill="#E8F0FE"/>
+  <text class="t-bold" x="578" y="46">API · Express 5 (puerto 4000)</text>
+  <text class="t-small" x="578" y="66">src/index.js → app.js (helmet, cors, cookies)</text>
+  <rect x="578" y="78" width="165" height="32" rx="8" fill="#fff" stroke="#9FB3C4"/><text x="588" y="99" class="t-small">middleware/ (sesión, roles, zod)</text>
+  <rect x="756" y="78" width="168" height="32" rx="8" fill="#fff" stroke="#9FB3C4"/><text x="766" y="99" class="t-small">modules/ (un router por área)</text>
+  <rect x="578" y="120" width="165" height="32" rx="8" fill="#fff" stroke="#9FB3C4"/><text x="588" y="141" class="t-small">lib/ (pagos, correo, fechas…)</text>
+  <rect x="756" y="120" width="168" height="32" rx="8" fill="#fff" stroke="#9FB3C4"/><text x="766" y="141" class="t-small">db/ (schema.js, seed, migrate)</text>
+  <rect x="578" y="170" width="346" height="84" rx="10" fill="#F1ECFA" stroke="#B9A8DD"/>
+  <text class="t-bold" x="592" y="192">jobs/ · tareas periódicas</text>
+  <text class="t-small" x="592" y="211">vencer borradores (60 s) · vencer solicitudes (60 s)</text>
+  <text class="t-small" x="592" y="228">completar citas y recordatorios (5 min)</text>
+  <text class="t-small" x="592" y="245">Google: cola cada 10 s · lectura cada 45 s</text>
+
+  <rect class="box" x="560" y="330" width="380" height="110" fill="#EAF6EC"/>
+  <text class="t-bold" x="578" y="356">PostgreSQL (base reserya)</text>
+  <text class="t-small" x="578" y="376">21 tablas · Drizzle ORM · drizzle/*.sql</text>
+  <text class="t-small" x="578" y="394">btree_gist + restricción de exclusión:</text>
+  <text class="t-small" x="578" y="412">la base impide reservas empalmadas</text>
+
+  <rect class="box" x="20" y="200" width="250" height="64" fill="#FFF3D6"/>
+  <text class="t-bold" x="38" y="226">Stripe</text><text class="t-small" x="38" y="246">lib/payments.js · modules/webhooks</text>
+  <rect class="box" x="20" y="285" width="250" height="64" fill="#FFF3D6"/>
+  <text class="t-bold" x="38" y="311">Google (login y Calendar)</text><text class="t-small" x="38" y="331">modules/calendar · modules/auth</text>
+  <rect class="box" x="20" y="370" width="250" height="64" fill="#FFF3D6"/>
+  <text class="t-bold" x="38" y="396">Correo (SMTP o consola)</text><text class="t-small" x="38" y="416">lib/email.js</text>
+
+  <path class="arrow" d="M250 90 H320"/>
+  <path class="arrow" d="M490 90 H560"/>
+  <path class="arrow" d="M750 270 V330"/>
+  <path class="arrow-d" d="M560 190 L270 232"/>
+  <path class="arrow-d" d="M560 215 L270 317"/>
+  <path class="arrow-d" d="M560 240 L270 402"/>
+  <text class="t-small" x="300" y="170">webhook de Stripe llega a /api/webhooks/stripe</text>
+</svg>
+</div>
+<p class="lead">Líneas punteadas: llamadas a servicios externos. El webhook de Stripe entra por <code>app.js</code> antes de <code>express.json()</code>, porque necesita el cuerpo sin procesar para verificar la firma.</p>
+
+<h3>Cómo se monta la API (app.js)</h3>
+<div class="scroll"><table>
+  <tr><th>Prefijo</th><th>Archivo</th><th>Para qué</th></tr>
+  <tr><td><code>/api/webhooks</code></td><td><code>modules/webhooks/routes.js</code></td><td>Avisos de Stripe (firma + sin duplicados)</td></tr>
+  <tr><td><code>/api/config</code>, <code>/api/categories</code></td><td><code>modules/catalog/routes.js</code></td><td>Modo de pago, llave pública de Stripe, categorías</td></tr>
+  <tr><td><code>/api/auth</code>, <code>/api/me</code></td><td><code>modules/auth/routes.js</code></td><td>Registro, login, Google, recuperar clave, perfil</td></tr>
+  <tr><td><code>/api/admin</code></td><td><code>modules/admin/routes.js</code></td><td>Solo admin: claves de registro, aprobar negocios</td></tr>
+  <tr><td><code>/api/business/owner</code></td><td><code>modules/owner/routes.js</code></td><td>PIN del dueño: desbloquear, bloquear, cambiar, recuperar</td></tr>
+  <tr><td><code>/api/business/...</code></td><td><code>modules/business-setup/*</code> y <code>modules/business-ops/routes.js</code></td><td>Configurar el negocio y operar (solicitudes, agenda, pagos)</td></tr>
+  <tr><td><code>/api/public</code></td><td><code>modules/public/routes.js</code></td><td>Inicio, búsqueda, perfil y horarios libres (sin sesión)</td></tr>
+  <tr><td><code>/api/bookings</code></td><td><code>modules/bookings/routes.js</code></td><td>Reservas del cliente</td></tr>
+  <tr><td><code>/api/reviews</code></td><td><code>modules/reviews/routes.js</code></td><td>Reseñas</td></tr>
+  <tr><td><code>/api/live</code></td><td><code>modules/live/routes.js</code></td><td>Agenda en vivo pública (por token)</td></tr>
+  <tr><td><code>/api/calendar</code></td><td><code>modules/calendar/routes.js</code></td><td>Conectar y sincronizar Google Calendar</td></tr>
+</table></div>
+
+<!-- ============ 3. CARPETAS ============ -->
+<h2 id="carpetas">3. Mapa de carpetas</h2>
+<p class="lead">Regla general del backend: <b>routes.js recibe y valida, service/actions.js decide, queries.js consulta, schema.js define las tablas</b>.</p>
+<div class="card tree"><span class="c"># raíz</span>
+ReserYa/
+├─ package.json, pnpm-workspace.yaml   <span class="c">monorepo (scripts: dev, test, build, db:*)</span>
+├─ README.md                           <span class="c">cómo correrlo, cuentas demo, estructura</span>
+├─ docs/                               <span class="c">base-de-datos.md, guía de estilo, pantallas de alta fidelidad, esta guía</span>
+├─ apps/
+│  ├─ api/                             <span class="c">BACKEND</span>
+│  │  ├─ drizzle/                      <span class="c">migraciones SQL (0000_init, 0001_exclusion)</span>
+│  │  ├─ test/                         <span class="c">12 archivos, 107 pruebas (node:test + supertest)</span>
+│  │  └─ src/
+│  │     ├─ index.js                   <span class="c">arranca el servidor y las tareas</span>
+│  │     ├─ app.js                     <span class="c">arma Express y monta los routers</span>
+│  │     ├─ config/env.js              <span class="c">variables de entorno validadas con zod; zona America/Tijuana</span>
+│  │     ├─ db/                        <span class="c">schema.js (467 líneas), index.js, migrate.js, reset.js, seed/</span>
+│  │     ├─ middleware/                <span class="c">auth.js (sesión y roles), validate.js (zod), error.js (errores → JSON)</span>
+│  │     ├─ lib/                       <span class="c">session, crypto, payments, email, time, tokens, validators, storage, businessReady</span>
+│  │     ├─ jobs/index.js              <span class="c">reloj que ejecuta las tareas de cada módulo</span>
+│  │     └─ modules/
+│  │        ├─ auth/ owner/ admin/ catalog/
+│  │        ├─ business-setup/         <span class="c">register, profile (fotos), services, resources, rules</span>
+│  │        ├─ business-ops/           <span class="c">routes, actions (aceptar/rechazar…), queries (agenda, stats), emails, jobs</span>
+│  │        ├─ public/                 <span class="c">routes, availability (horarios libres), cards (búsqueda)</span>
+│  │        ├─ bookings/               <span class="c">routes, service (borrador, pago, cancelar), emails, jobs</span>
+│  │        ├─ calendar/               <span class="c">routes, google (API de Google), sync (cola y lectura), jobs</span>
+│  │        └─ reviews/ live/ webhooks/
+│  └─ web/                             <span class="c">FRONTEND</span>
+│     ├─ index.html, vite.config.js
+│     └─ src/
+│        ├─ main.jsx, router.jsx       <span class="c">punto de entrada y mapa de URLs</span>
+│        ├─ routes/                    <span class="c">rutas por área (client, businessSetup, businessOps, calendar, admin)</span>
+│        ├─ pages/                     <span class="c">una pantalla = un archivo (client/, business/, admin/, auth/, live/, legal/)</span>
+│        ├─ features/                  <span class="c">hooks de datos y componentes de cada área (TanStack Query)</span>
+│        ├─ components/                <span class="c">ui/ (shadcn), layout/ (menús), piezas propias (States, Field…)</span>
+│        ├─ hooks/                     <span class="c">useAuth, useConfig</span>
+│        ├─ lib/                       <span class="c">api.js, query.js, format.js, pageTitle.js</span>
+│        └─ index.css                  <span class="c">colores y tipografía (guía de estilo)</span>
+</div>
+
+<!-- ============ 4. BUSCADOR ============ -->
+<h2 id="buscador">4. ¿Dónde vive…? (buscador)</h2>
+<p class="lead">Escribe una palabra: "pago", "PIN", "horario", "foto", "google", "cancelar"… Esta es la sección para practicar el <b>Mapa del sistema</b>.</p>
+<input id="q" class="search" type="search" placeholder="Busca: pago, PIN, horario, foto, sesión, cancelar, reseña…" autocomplete="off">
+<p id="count" class="lead" style="margin-top:8px"></p>
+<div class="scroll"><table id="where"><thead><tr><th>Qué</th><th>Archivo y línea</th><th>Cómo funciona</th></tr></thead><tbody></tbody></table></div>
+
+<!-- ============ 5. FLUJOS ============ -->
+<h2 id="flujos">5. Flujos paso a paso</h2>
+
+<h3>A. Reservar y pagar (cliente)</h3>
+<ol class="steps">
+  <li><b>Ve el negocio.</b> Pantalla <code>/negocios/:id</code>.<span class="where"><span class="tag web">web</span><code>pages/client/BusinessProfile.jsx</code> → <span class="tag api">api</span><code>GET /api/public/businesses/:id</code> en <code>modules/public/routes.js</code></span></li>
+  <li><b>Elige servicio, persona, fecha y hora.</b> Ruta protegida: solo clientes con sesión.<span class="where"><span class="tag web">web</span><code>pages/client/BookingFlow.jsx</code> (<code>Flow</code> :106, <code>DateTimeStep</code> :368, <code>ConfirmStep</code> :584) → <code>GET /api/public/businesses/:id/days</code> y <code>/availability</code> → <span class="tag api">api</span><code>public/availability.js</code> <code>daySlots</code> :244</span></li>
+  <li><b>Pulsa Continuar: se crea un borrador.</b> Solo si el correo está verificado y hay teléfono.<span class="where"><span class="tag api">api</span><code>POST /api/bookings</code> <code>bookings/routes.js</code> :265 (<code>requireReadyClient</code>) → <code>createDraft</code> <code>bookings/service.js</code> :73</span>
+    <ul class="tight"><li>Vuelve a calcular que el horario siga libre (mismo <code>daySlots</code>).</li><li>Descarta borradores anteriores del mismo cliente y revisa el máximo de 3 solicitudes pendientes.</li><li>Inserta la reserva: <code>pending</code> (el negocio debe aceptar) o <code>hold</code> (aceptación automática, aparta 10 min).</li><li>Crea la autorización en Stripe sin cobrar y la fila en <code>payments</code> con estado <code>pending</code>.</li></ul></li>
+  <li><b>Paga con tarjeta.</b> Stripe Elements autoriza (aparta) el monto; sin llaves aparece el botón "Pagar (prueba)".<span class="where"><span class="tag web">web</span><code>features/client/payment.jsx</code> (<code>StripeForm</code> :69, <code>FakeForm</code> :119) · <span class="tag api">api</span><code>lib/payments.js</code> <code>createAuthorization</code> :20 (<code>capture_method: 'manual'</code>)</span></li>
+  <li><b>Stripe avisa y ReserYa lo registra.</b> Dos caminos para que no se pierda: el webhook y la confirmación que manda la web.<span class="where"><span class="tag api">api</span><code>POST /api/webhooks/stripe</code> <code>webhooks/routes.js</code> :40 (firma + <code>stripe_events</code> sin duplicados) y <code>POST /api/bookings/:id/payment-confirmed</code> :282 → <code>applyAuthorized</code> <code>service.js</code> :227 (idempotente)</span>
+    <ul class="tight"><li>Borrador <code>pending</code>: pago → <code>authorized</code>; se guarda <code>submittedAt</code> y <code>respondBy</code> = el menor entre ahora+12 h y la cita−1 h; correo "nueva solicitud" al negocio.</li><li><code>hold</code>: se cobra al instante, reserva → <code>confirmed</code> y se encola el evento de Google.</li></ul></li>
+  <li><b>Si abandona el pago:</b> la tarea <code>vencer-borradores</code> (cada 60 s) libera el horario y cancela la autorización.<span class="where"><span class="tag job">job</span><code>bookings/jobs.js</code> → <code>expireAbandonedDrafts</code> <code>service.js</code> :383 (30 min de borrador, 10 de apartado)</span></li>
+</ol>
+
+<h3>B. El negocio responde</h3>
+<ol class="steps">
+  <li><b>Ve la solicitud.</b><span class="where"><span class="tag web">web</span><code>pages/business/ops/Requests.jsx</code> → <code>GET /api/business/requests</code> → <code>business-ops/queries.js</code> <code>listRequests</code> :63</span></li>
+  <li><b>Acepta.</b><span class="where"><span class="tag api">api</span><code>POST /api/business/requests/:id/accept</code> <code>business-ops/routes.js</code> :67 → <code>acceptRequest</code> <code>actions.js</code> :65</span>
+    <ul class="tight"><li>Una transacción bloquea la fila (<code>FOR UPDATE</code>), revisa que siga pendiente, no haya vencido y el pago esté autorizado.</li><li>La pone <code>confirmed</code>, el pago <code>captured</code>, encola evento de Google y <b>cobra al final</b>: si Stripe falla se revierte todo.</li><li>Después rechaza automáticamente las solicitudes pendientes que se empalman con la misma persona.</li></ul></li>
+  <li><b>Rechaza.</b> Libera la autorización sin cobrar.<span class="where"><span class="tag api">api</span><code>rejectRequest</code> :133 → <code>closeRequest</code> :37 → <code>lib/payments.js</code> <code>release</code></span></li>
+  <li><b>No responde:</b> a las 12 h (o 1 h antes de la cita) vence sola.<span class="where"><span class="tag job">job</span><code>business-ops/jobs.js</code> → <code>expireRequests</code> :221</span></li>
+  <li><b>Después de la cita:</b> pasa a <code>completed</code> (<code>completePastBookings</code> :241, cada 5 min) o el dueño marca <code>no_show</code> (:141). Se manda recordatorio 24 h antes (<code>sendReminders</code> :256).</li>
+</ol>
+
+<h3>C. Cancelar</h3>
+<ol class="steps">
+  <li><b>Cliente:</b> pendiente o borrador, siempre; confirmada solo hasta <code>cancellationLimitHours</code> antes de la cita; reembolso del 100 %.<span class="where"><span class="tag api">api</span><code>POST /api/bookings/:id/cancel</code> → <code>cancelByClient</code> <code>service.js</code> :306</span></li>
+  <li><b>Negocio:</b> solo reservas confirmadas, requiere modo dueño; reembolsa dentro de la transacción y avisa al cliente.<span class="where"><span class="tag api">api</span><code>POST /api/business/bookings/:id/cancel</code> → <code>cancelByBusiness</code> <code>actions.js</code> :170</span></li>
+  <li>En ambos casos se encola el borrado del evento de Google.</li>
+</ol>
+
+<h3>D. Google Calendar en los dos sentidos</h3>
+<ol class="steps">
+  <li><b>Conectar.</b> El dueño pulsa "Conectar" y Google devuelve un código.<span class="where"><span class="tag web">web</span><code>pages/business/calendar/GoogleCalendar.jsx</code> → <span class="tag api">api</span><code>GET /api/calendar/connect</code> y <code>/callback</code> (<code>calendar/routes.js</code> :31, :52) → <code>saveConnection</code> <code>sync.js</code> :97</span>
+    <ul class="tight"><li>El token de actualización se guarda <b>cifrado con AES-256-GCM</b> (<code>lib/crypto.js</code> :20).</li><li>Permiso mínimo: <code>calendar.app.created</code> (solo toca calendarios creados por ReserYa), <code>google.js</code> :14.</li><li><code>ensureCalendars</code> :218 crea un calendario "ReserYa · Nombre" por cada persona o espacio.</li></ul></li>
+  <li><b>ReserYa → Google.</b> Aceptar, confirmar o cancelar solo <i>encola</i> un trabajo; otra tarea lo manda.<span class="where"><span class="tag api">api</span><code>lib/calendarSync.js</code> (<code>enqueueCalendarSync</code>) → tabla <code>calendar_sync_jobs</code> → <span class="tag job">job</span><code>calendar-queue</code> cada 10 s → <code>processQueue</code> <code>sync.js</code> :360 → <code>runJob</code> :328. Si Google falla: hasta 8 intentos con espera creciente (<code>MAX_ATTEMPTS</code> :39)</span></li>
+  <li><b>Google → ReserYa.</b> Cada 45 s se leen los cambios.<span class="where"><span class="tag job">job</span><code>calendar-pull</code> → <code>pullChanges</code> :683 → <code>syncResource</code> :642 → <code>google.js</code> <code>listChanges</code> :204</span>
+    <ul class="tight"><li>Evento <b>personal</b> en el calendario de una persona → fila en <code>external_busy_blocks</code> → ese horario deja de ofrecerse (<code>availability.js</code> lo trata como ocupado).</li><li>Evento de una <b>reserva</b> movido → <code>moveFromGoogle</code> :513 actualiza la hora y avisa al cliente (si choca con otra, no cambia).</li><li>Evento de una reserva <b>borrado</b> → <code>cancelFromGoogle</code> :564 cancela por el negocio con reembolso.</li><li>Solo se atiende lo de reservas <code>confirmed</code>.</li></ul></li>
+</ol>
+
+<h3>E. Sesión, roles y modo dueño</h3>
+<ol class="steps">
+  <li><b>Login.</b> Contraseña con bcrypt; máximo 10 intentos cada 15 min.<span class="where"><span class="tag api">api</span><code>POST /api/auth/login</code> <code>auth/routes.js</code> :86 (<code>loginLimiter</code> :23) → <code>createSession</code> <code>lib/session.js</code> :19</span></li>
+  <li><b>Sesión.</b> Token aleatorio en cookie <code>rsy_session</code> (<code>httpOnly</code>, <code>sameSite: lax</code>); en la base solo se guarda su hash SHA-256 (tabla <code>sessions</code>).<span class="where"><span class="tag api">api</span><code>middleware/auth.js</code> <code>sessionMiddleware</code> :8 corre en <i>cada</i> petición y deja <code>req.user</code> y <code>req.business</code></span></li>
+  <li><b>Roles.</b> <code>requireRole</code> :23, <code>requireReadyClient</code> :32, <code>requireActiveBusiness</code> :43. En la web: <code>components/RequireAuth.jsx</code> manda a <code>/entrar?next=…</code>.</li>
+  <li><b>Modo dueño (PIN).</b> Desbloquea 5 minutos, y cada uso los renueva. Tras varios intentos fallidos se bloquea 15 min.<span class="where"><span class="tag api">api</span><code>owner/routes.js</code> :44 (<code>unlock</code>), <code>middleware/auth.js</code> <code>requireOwnerMode</code> :52, <code>session.js</code> <code>OWNER_MODE_MINUTES</code> :9 · <span class="tag web">web</span><code>components/layout/OwnerGate.jsx</code></span></li>
+  <li><b>Login con Google:</b> <code>GET /api/auth/google</code> :181 y <code>/google/callback</code> :198.</li>
+</ol>
+
+<h3>F. Cómo se decide que un horario está libre</h3>
+<p class="lead">Función pura <code>daySlots</code> / <code>resourceDaySlots</code> en <code>modules/public/availability.js</code> (:244 y :208). Se prueba sin base de datos.</p>
+<div class="card"><ul class="tight">
+  <li>La persona trabaja ese día (<code>resource_schedules</code>) y la cita cabe completa dentro de un bloque.</li>
+  <li>El inicio cae en la rejilla (<code>slotIntervalMinutes</code>) contada desde el inicio de cada bloque.</li>
+  <li>No es día cerrado del negocio ni de la persona (<code>closed_days</code>).</li>
+  <li>Respeta anticipación mínima y máxima. Para solicitudes manuales la mínima efectiva es de <b>90 min</b> (<code>effectiveMinNotice</code> :46) porque la solicitud vence 1 h antes.</li>
+  <li>No se empalma con reservas confirmadas o apartados vigentes, con <code>bufferMinutes</code> de descanso.</li>
+  <li>No se empalma con eventos de Google de esa persona (<code>external_busy_blocks</code>).</li>
+  <li>Las solicitudes <i>pendientes</i> <b>no</b> bloquean horario (por eso dos clientes pueden pedir lo mismo y el negocio elige).</li>
+  <li>"Cualquiera": se agrupan por hora y se asigna la persona con menos citas ese día (<code>leastBusyResource</code> <code>service.js</code> :167).</li>
+</ul></div>
+
+<!-- ============ 6. ESTADOS ============ -->
+<h2 id="estados">6. Estados de una reserva y de su pago</h2>
+<p class="lead">Enum <code>booking_status</code> y <code>payment_status</code> en <code>db/schema.js</code> (:46 y :58).</p>
+<div class="diagram">
+<svg viewBox="0 0 960 400" role="img" aria-label="Estados de la reserva">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4A5D6E"/></marker></defs>
+  <rect class="box" x="20" y="40" width="190" height="62" fill="#FFF3D6"/><text class="t-bold" x="36" y="66">pending (borrador)</text><text class="t-small" x="36" y="86">sin submittedAt · pago pending</text>
+  <rect class="box" x="280" y="40" width="190" height="62" fill="#E3F2F9"/><text class="t-bold" x="296" y="66">pending (solicitud)</text><text class="t-small" x="296" y="86">pago authorized · espera al negocio</text>
+  <rect class="box" x="560" y="10" width="170" height="52" fill="#E4F4EA"/><text class="t-bold" x="576" y="42">confirmed</text>
+  <rect class="box" x="560" y="80" width="170" height="52" fill="#FBE9E7"/><text class="t-bold" x="576" y="112">rejected</text>
+  <rect class="box" x="560" y="150" width="170" height="52" fill="#EEF2F6"/><text class="t-bold" x="576" y="182">expired</text>
+  <rect class="box" x="20" y="170" width="190" height="62" fill="#F1ECFA"/><text class="t-bold" x="36" y="196">hold (autoaceptar)</text><text class="t-small" x="36" y="216">aparta 10 min mientras paga</text>
+  <rect class="box" x="790" y="10" width="150" height="52" fill="#E4F4EA"/><text class="t-bold" x="806" y="42">completed</text>
+  <rect class="box" x="790" y="80" width="150" height="52" fill="#FBE9E7"/><text class="t-bold" x="806" y="112">no_show</text>
+  <rect class="box" x="790" y="150" width="150" height="52" fill="#FBE9E7"/><text class="t-bold" x="806" y="182">cancelled</text>
+
+  <path class="arrow" d="M210 71 H280"/><text class="t-small" x="214" y="62">pago autorizado</text>
+  <path class="arrow" d="M470 55 L560 36"/><text class="t-small" x="468" y="30">acepta</text>
+  <path class="arrow" d="M470 75 L560 104"/><text class="t-small" x="476" y="96">rechaza</text>
+  <path class="arrow" d="M440 102 L560 170"/><text class="t-small" x="440" y="140">12 h sin respuesta</text>
+  <path class="arrow" d="M730 36 H790"/><text class="t-small" x="732" y="28">pasa la hora</text>
+  <path class="arrow" d="M730 46 L790 100"/><text class="t-small" x="736" y="84">no llegó</text>
+  <path class="arrow" d="M645 62 C 700 150, 760 170, 790 176"/><text class="t-small" x="690" y="150">cancelan</text>
+  <path class="arrow" d="M115 232 C 115 300, 560 300, 645 62"/><text class="t-small" x="260" y="296">hold + pago autorizado → confirmed (cobra al instante)</text>
+  <path class="arrow-d" d="M115 102 V170"/><text class="t-small" x="124" y="140">autoAccept = sí</text>
+  <path class="arrow-d" d="M200 232 L560 176"/><text class="t-small" x="300" y="206">no paga → expired</text>
+  <text class="t-small" x="20" y="350">Pago: pending → authorized → captured (al aceptar) → refunded (cancelación)  ·  authorized → released (rechazo o vencimiento)  ·  failed (tarjeta rechazada)</text>
+  <text class="t-small" x="20" y="372">El horario solo lo protege la base de datos para estados hold y confirmed (restricción bookings_no_overlap).</text>
+</svg>
+</div>
+
+<!-- ============ 7. BD ============ -->
+<h2 id="bd">7. Base de datos (21 tablas)</h2>
+<p class="lead">Definidas con Drizzle en <code>apps/api/src/db/schema.js</code>. Explicación completa y desviaciones del diseño original: <code>docs/base-de-datos.md</code>. Dinero siempre en centavos enteros; fechas en UTC y se muestran en America/Tijuana.</p>
+<div class="grid2">
+  <div class="card"><b>Personas y acceso</b><ul class="tight">
+    <li><code>users</code> :70, rol, contraseña con hash, <code>googleId</code></li>
+    <li><code>sessions</code> :84, hash del token, <code>ownerUnlockedUntil</code></li>
+    <li><code>auth_tokens</code> :102, verificar correo y recuperar clave</li>
+    <li><code>registration_keys</code> :129, claves que el admin da a los negocios</li></ul></div>
+  <div class="card"><b>Negocio y su oferta</b><ul class="tight">
+    <li><code>categories</code> :119</li>
+    <li><code>businesses</code> :139, estado, reglas, PIN, tokens de Google cifrados</li>
+    <li><code>business_photos</code> :190, <code>services</code> :205</li>
+    <li><code>resources</code> :226 (persona o espacio), <code>resource_services</code> :246</li>
+    <li><code>resource_schedules</code> :259 (horario semanal), <code>closed_days</code> :279</li></ul></div>
+  <div class="card"><b>Reservas y dinero</b><ul class="tight">
+    <li><code>bookings</code> :297, con <b>restricción de exclusión</b> en <code>drizzle/0001_exclusion.sql</code></li>
+    <li><code>payments</code> :340 (id del PaymentIntent de Stripe, estado)</li>
+    <li><code>stripe_events</code> :357, para no procesar dos veces un mismo aviso</li>
+    <li><code>reviews</code> :364, <code>business_views</code> :385 (para estadísticas)</li></ul></div>
+  <div class="card"><b>Integraciones y avisos</b><ul class="tight">
+    <li><code>calendar_sync_jobs</code> :400, cola hacia Google</li>
+    <li><code>external_busy_blocks</code> :417, eventos de Google que bloquean horarios</li>
+    <li><code>live_links</code> :436, agenda en vivo por token</li>
+    <li><code>email_log</code> :454, correos enviados (evita repetir recordatorios)</li></ul></div>
+</div>
+<div class="card"><b>La restricción que más lucirá en la defensa</b><br>
+<code>EXCLUDE USING gist (resource_id WITH =, tstzrange(starts_at, ends_at, '[)') WITH &amp;&amp;) WHERE (status IN ('hold','confirmed'))</code><br>
+Significa: <i>una misma persona no puede tener dos reservas hold/confirmed cuyos rangos de tiempo se crucen</i>. Aunque dos clientes pulsen al mismo tiempo, PostgreSQL rechaza la segunda con el error <code>23P01</code>, y <code>middleware/error.js</code> lo convierte en un 409 <code>slot_taken</code> ("Ese horario ya no está disponible"). Las pendientes no la activan porque no bloquean horario.</div>
+
+<!-- ============ 8. RUTAS ============ -->
+<h2 id="rutas">8. Pantallas (web) y su API</h2>
+<p class="lead">Mapa de URLs en <code>apps/web/src/router.jsx</code> (:43), que reparte en <code>routes/client.jsx</code>, <code>businessSetup.jsx</code>, <code>businessOps.jsx</code>, <code>calendar.jsx</code> y <code>admin.jsx</code>. Datos con TanStack Query: <code>features/*/queries.js</code> o <code>hooks.js</code>.</p>
+<div class="scroll"><table>
+  <tr><th>URL</th><th>Pantalla (archivo)</th><th>Llama a</th></tr>
+  <tr><td><code>/</code></td><td><code>pages/client/Home.jsx</code></td><td><code>GET /public/home</code></td></tr>
+  <tr><td><code>/buscar</code></td><td><code>pages/client/Search.jsx</code> + <code>features/client/filters.jsx</code></td><td><code>GET /public/businesses</code> (filtros en <code>searchQuery</code> <code>public/routes.js</code> :137)</td></tr>
+  <tr><td><code>/negocios/:id</code></td><td><code>pages/client/BusinessProfile.jsx</code></td><td><code>GET /public/businesses/:id</code>, <code>/reviews</code></td></tr>
+  <tr><td><code>/negocios/:id/reservar</code></td><td><code>pages/client/BookingFlow.jsx</code></td><td><code>/days</code>, <code>/availability</code>, <code>POST /bookings</code></td></tr>
+  <tr><td><code>/reservas/:id/enviada</code></td><td><code>pages/client/BookingSent.jsx</code></td><td><code>POST /bookings/:id/payment-confirmed</code></td></tr>
+  <tr><td><code>/reservas</code>, <code>/reservas/:id</code></td><td><code>MyBookings.jsx</code>, <code>BookingDetail.jsx</code></td><td><code>GET /bookings</code>, <code>/bookings/:id</code>, <code>POST …/cancel</code></td></tr>
+  <tr><td><code>/reservas/:id/resena</code></td><td><code>WriteReview.jsx</code></td><td><code>POST /reviews</code></td></tr>
+  <tr><td><code>/volver-a-agendar</code>, <code>/perfil</code></td><td><code>Rebook.jsx</code>, <code>Profile.jsx</code></td><td><code>GET /bookings/rebook</code>, <code>PATCH /me</code></td></tr>
+  <tr><td><code>/entrar</code>, <code>/registro</code>, <code>/recuperar</code>, <code>/restablecer</code>, <code>/verificar-correo</code></td><td><code>pages/auth/*</code></td><td><code>/auth/*</code></td></tr>
+  <tr><td><code>/negocio/registro</code></td><td><code>pages/business/setup/RegisterBusiness.jsx</code></td><td><code>POST /business/register</code> (clave de registro)</td></tr>
+  <tr><td><code>/negocio/solicitudes</code>, <code>/agenda</code>, <code>/reservas</code></td><td><code>pages/business/ops/Requests.jsx</code>, <code>Agenda.jsx</code>, <code>Bookings.jsx</code></td><td><code>/business/requests</code>, <code>/agenda</code>, <code>/bookings</code></td></tr>
+  <tr><td><code>/negocio/dueno</code> (PIN)</td><td><code>Dashboard.jsx</code>, <code>Stats.jsx</code>, <code>Payments.jsx</code>, <code>LiveLinks.jsx</code></td><td><code>/business/dashboard</code>, <code>/stats</code>, <code>/payments</code>, <code>/live-links</code></td></tr>
+  <tr><td><code>/negocio/dueno/servicios</code>, <code>equipo</code>, <code>reglas</code>, <code>perfil</code></td><td><code>pages/business/setup/Services.jsx</code>, <code>Team.jsx</code>, <code>Rules.jsx</code>, <code>PublicProfile.jsx</code></td><td><code>/business/services</code>, <code>/resources</code>, <code>/rules</code>, <code>/profile</code>, <code>/photos</code></td></tr>
+  <tr><td><code>/negocio/dueno/google</code></td><td><code>pages/business/calendar/GoogleCalendar.jsx</code></td><td><code>/calendar/status</code>, <code>/connect</code>, <code>/sync-now</code>, <code>/disconnect</code></td></tr>
+  <tr><td><code>/admin/pendientes</code>, <code>negocios</code>, <code>negocios/:id</code>, <code>claves</code></td><td><code>pages/admin/*</code></td><td><code>/admin/*</code></td></tr>
+  <tr><td><code>/en-vivo/:token</code></td><td><code>pages/live/LiveScreen.jsx</code></td><td><code>GET /live/:token</code> (sin sesión)</td></tr>
+  <tr><td><code>*</code></td><td><code>pages/NotFound.jsx</code></td><td>—</td></tr>
+</table></div>
+<p class="lead" style="margin-top:12px">Layouts (los menús): <code>components/layout/ClientLayout.jsx</code>, <code>BusinessLayout.jsx</code>, <code>AdminLayout.jsx</code>, <code>AuthLayout.jsx</code>, <code>OwnerGate.jsx</code> (pide el PIN). Títulos de pestaña: <code>lib/pageTitle.js</code>.</p>
+
+<!-- ============ 9. SEGURIDAD ============ -->
+<h2 id="seguridad">9. Seguridad y reglas técnicas (con el RNF que cubren)</h2>
+<div class="scroll"><table>
+  <tr><th>Tema</th><th>Qué se hace</th><th>Dónde</th></tr>
+  <tr><td>Contraseñas y PIN (RNF-07)</td><td>bcrypt con costo 10; nunca se guardan en claro</td><td><code>lib/crypto.js</code> :9</td></tr>
+  <tr><td>Sesión (RNF-08)</td><td>Cookie httpOnly + hash en base; cada ruta revisa el rol</td><td><code>lib/session.js</code>, <code>middleware/auth.js</code></td></tr>
+  <tr><td>Tokens de Google (RNF-11)</td><td>Cifrados con AES-256-GCM; la llave está en <code>ENCRYPTION_KEY</code> del <code>.env</code></td><td><code>lib/crypto.js</code> :20</td></tr>
+  <tr><td>Datos de tarjeta (RNF-10)</td><td>Nunca pasan por ReserYa: los captura Stripe Elements</td><td><code>features/client/payment.jsx</code></td></tr>
+  <tr><td>Intentos de login (RNF-12)</td><td>10 cada 15 min; el registro de negocios también limita</td><td><code>auth/routes.js</code> :23, <code>business-setup/register.js</code> :19</td></tr>
+  <tr><td>Validación de entrada</td><td>zod en cada ruta; errores 400 con detalle por campo</td><td><code>middleware/validate.js</code>, <code>lib/validators.js</code>, <code>error.js</code></td></tr>
+  <tr><td>Cabeceras y CORS</td><td>helmet; CORS solo para <code>WEB_URL</code> con cookies</td><td><code>app.js</code></td></tr>
+  <tr><td>Webhooks</td><td>Verificación de firma de Stripe y tabla anti-duplicados</td><td><code>webhooks/routes.js</code>, <code>lib/payments.js</code></td></tr>
+  <tr><td>Fotos</td><td>Máx. 8 fotos de 5 MB; el tipo se detecta por los primeros bytes, no por el nombre</td><td><code>business-setup/profile.js</code> :16, :88</td></tr>
+  <tr><td>Agenda en vivo</td><td>Token largo en la URL; muestra nombre corto, servicio y hora, sin teléfono ni precio</td><td><code>live/routes.js</code></td></tr>
+  <tr><td>Aislamiento entre negocios</td><td>Cada acción busca la reserva <i>con el id del negocio de la sesión</i> (<code>findOwned</code>)</td><td><code>business-ops/actions.js</code> :49</td></tr>
+  <tr><td>Secretos</td><td><code>.env</code> está en <code>.gitignore</code>; en el repo solo hay <code>.env.example</code></td><td><code>apps/api/.env.example</code></td></tr>
+</table></div>
+
+<!-- ============ 10. LÍMITES ============ -->
+<h2 id="limites">10. Casos límite: qué hace tu app (y dónde fallaría)</h2>
+<p class="lead">El profe te pedirá uno. No pierdes puntos por que algo falle; pierdes si se rompe <b>sin avisar</b> (pantalla en blanco, error en consola, datos duplicados). Marcado: ✔ lo vi en el código · ⚠ hueco real o por verificar en el navegador.</p>
+<div class="scroll"><table>
+  <tr><th>Caso</th><th>Qué hace</th><th>Dónde</th><th></th></tr>
+  <tr><td>Formulario vacío o mal llenado</td><td>La API responde 400 con el detalle por campo y la web lo muestra bajo cada campo</td><td><code>middleware/validate.js</code>, <code>lib/api.js</code> (<code>fieldError</code>)</td><td>✔</td></tr>
+  <tr><td>Texto donde va número; número negativo</td><td>zod convierte y rechaza (<code>nonnegative</code>, máx. 1,000,000)</td><td><code>lib/validators.js</code> <code>pesosToCents</code></td><td>✔</td></tr>
+  <tr><td>Nombre de 200 letras</td><td>Rechazado: nombre ≤ 80, nombre del negocio ≤ 80, contraseña ≤ 100, búsqueda ≤ 80, reseña ≤ 500, cuerpo JSON ≤ 1 MB</td><td><code>validators.js</code>, <code>app.js</code></td><td>✔ (comentario de reseña ≤ 500; prueba tú la descripción del negocio)</td></tr>
+  <tr><td>Buscar algo que no existe</td><td>Muestra un mensaje de "sin resultados" con acción</td><td><code>components/States.jsx</code> <code>EmptyState</code> (usado en 17 pantallas)</td><td>✔</td></tr>
+  <tr><td>Lista sin elementos</td><td>Igual: <code>EmptyState</code> (reservas, solicitudes, equipo…)</td><td><code>pages/client/MyBookings.jsx</code>, <code>pages/business/ops/*</code></td><td>✔</td></tr>
+  <tr><td>Doble clic en pagar / reservar</td><td>Botón deshabilitado mientras corre; además Stripe usa llave de idempotencia por reserva y <code>applyAuthorized</code> es idempotente</td><td><code>payment.jsx</code> :108, :138; <code>payments.js</code> :20; <code>service.js</code> :227</td><td>✔</td></tr>
+  <tr><td>Dos personas piden el mismo horario a la vez</td><td>PostgreSQL rechaza el empalme → 409 <code>slot_taken</code> → la web avisa y pide elegir otro</td><td><code>0001_exclusion.sql</code>, <code>error.js</code>, <code>BookingFlow.jsx</code> :144</td><td>✔</td></tr>
+  <tr><td>Recargar a mitad del pago</td><td>El borrador vive en la base: vence a los 30 min (10 si es apartado) y libera todo. Al recargar el flujo empieza de nuevo y el borrador anterior se descarta</td><td><code>service.js</code> :73, :383</td><td>⚠ prueba la experiencia en el navegador</td></tr>
+  <tr><td>Tarjeta rechazada</td><td>El aviso <code>payment_failed</code> marca el pago como <code>failed</code>; el cliente reintenta</td><td><code>webhooks/routes.js</code>, <code>service.js</code> :284</td><td>✔</td></tr>
+  <tr><td>Sin sesión / sin permiso</td><td>Redirige a <code>/entrar?next=…</code> o a la página de su rol; la API responde 401/403</td><td><code>components/RequireAuth.jsx</code>, <code>lib/query.js</code> :16</td><td>✔</td></tr>
+  <tr><td>Demasiados intentos de login</td><td>429 con mensaje "Demasiados intentos. Espera unos minutos."</td><td><code>auth/routes.js</code> :23</td><td>✔ (te pasó hoy)</td></tr>
+  <tr><td>URL que no existe</td><td>Página 404 (web) o JSON 404 (API)</td><td><code>pages/NotFound.jsx</code>, <code>app.js</code></td><td>✔</td></tr>
+  <tr><td>Foto muy pesada o archivo falso</td><td>Límite de 5 MB y detección por contenido, con error en español</td><td><code>profile.js</code> :88-110</td><td>✔</td></tr>
+  <tr><td>API apagada o lenta</td><td>Las listas muestran <code>ErrorState</code> con botón "Reintentar"; pero el mensaje sería técnico ("Failed to fetch") porque <code>api()</code> no traduce fallos de red</td><td><code>States.jsx</code>, <code>lib/api.js</code></td><td>⚠ mejorable</td></tr>
+  <tr><td>Un componente se rompe al dibujar</td><td><b>No hay</b> <code>errorElement</code> en el router: saldría la pantalla de error por defecto de React Router</td><td><code>router.jsx</code></td><td>⚠ hueco real (arreglo de pocas líneas)</td></tr>
+  <tr><td>Google o Stripe fallan</td><td>El correo o la sincronización fallan sin tumbar la reserva; Google reintenta hasta 8 veces; si Stripe falla al aceptar, se revierte la transacción</td><td><code>email.js</code> (try/catch), <code>sync.js</code> :39, <code>actions.js</code> :65</td><td>✔</td></tr>
+</table></div>
+<div class="banner warn"><b>Antes del domingo:</b> recorre cada fila de esta tabla en el navegador con la app corriendo. Si algo falla y puedes explicar por qué y cómo lo arreglarías, también cuenta.</div>
+
+<!-- ============ 11. IA ============ -->
+<h2 id="ia">11. El cambio en vivo con IA (6 pts)</h2>
+<p class="lead">Te piden un cambio <b>pequeño</b>. Califican tres cosas: cómo lo pides, si revisas lo que te devuelve y si lo pruebas.</p>
+<div class="grid2">
+  <div class="card"><b>Cómo pedirlo</b><ol class="tight">
+    <li>Dilo con el <b>qué</b> y el <b>dónde</b>: "En <code>service.js</code> cambia <code>MAX_PENDING_REQUESTS</code> de 3 a 2".</li>
+    <li>Pon límites: "no toques otros archivos".</li>
+    <li>Pide que diga qué prueba o pantalla debería cambiar.</li></ol></div>
+  <div class="card"><b>Cómo revisarlo y probarlo</b><ol class="tight">
+    <li>Mira el cambio con <code>git diff</code> y léelo: ¿tocó solo lo pedido?</li>
+    <li>Corre <code>pnpm test</code> (o la prueba del área) y <code>pnpm lint</code>.</li>
+    <li>Pruébalo en el navegador.</li>
+    <li>Haz commit con mensaje claro.</li></ol></div>
+</div>
+<h3>Cambios pequeños probables (y dónde se hacen)</h3>
+<div class="scroll"><table>
+  <tr><th>Si te piden…</th><th>Tocas</th><th>Ojo con</th></tr>
+  <tr><td>Cambiar el máximo de solicitudes pendientes por cliente (hoy 3)</td><td><code>bookings/service.js</code> :20 (<code>MAX_PENDING_REQUESTS</code>)</td><td>Hay una prueba en <code>test/bookings.test.js</code> que usa el 3</td></tr>
+  <tr><td>Cambiar los minutos que se aparta un horario (hoy 10)</td><td><code>service.js</code> :22 (<code>HOLD_MINUTES</code>)</td><td>El texto del contador sale de <code>payment.jsx</code> <code>HoldCountdown</code> :159</td></tr>
+  <tr><td>Cambiar anticipación mínima para solicitudes (hoy 90 min)</td><td><code>public/availability.js</code> :38</td><td>La web muestra el texto "desde 1.5 h antes" a partir de este dato</td></tr>
+  <tr><td>Cambiar el tiempo para responder (hoy 12 h)</td><td><code>service.js</code> dentro de <code>applyAuthorized</code> (<code>12 * HOUR</code>)</td><td>Cambia también la regla de la solicitud (se documentó en <code>docs/base-de-datos.md</code> §8)</td></tr>
+  <tr><td>Duración del modo dueño (hoy 5 min)</td><td><code>lib/session.js</code> :9</td><td>—</td></tr>
+  <tr><td>Máximo de fotos o peso (hoy 8 y 5 MB)</td><td><code>business-setup/profile.js</code> :16-17</td><td>—</td></tr>
+  <tr><td>Intentos de login (hoy 10 por 15 min)</td><td><code>auth/routes.js</code> :23</td><td>Se reinicia al reiniciar la API</td></tr>
+  <tr><td>Color principal, tipografía o espacio</td><td><code>apps/web/src/index.css</code> (variables <code>--primary</code>…)</td><td>Sin degradados: solo colores sólidos (regla del proyecto)</td></tr>
+  <tr><td>Cambiar un texto o botón de una pantalla</td><td>El archivo de <code>pages/…</code> de la sección 8</td><td>—</td></tr>
+  <tr><td>Mostrar un campo nuevo (p. ej. teléfono del negocio) en el perfil</td><td>API: <code>public/routes.js</code> (<code>/businesses/:id</code>) → web: <code>BusinessProfile.jsx</code></td><td>Si es columna nueva: <code>schema.js</code> + <code>pnpm db:generate</code> + <code>pnpm db:migrate</code></td></tr>
+  <tr><td>Nuevo filtro u orden en la búsqueda</td><td><code>public/routes.js</code> :137 (<code>searchQuery</code>), <code>public/cards.js</code> :130, <code>features/client/filters.jsx</code></td><td>—</td></tr>
+</table></div>
+
+<!-- ============ 12. CRITERIO ============ -->
+<h2 id="criterio">12. Criterio y decisiones (la pregunta de la bitácora)</h2>
+<p class="lead">Te preguntarán, por ejemplo: <i>"¿qué te propuso la IA que rechazaste?"</i> o <i>"¿en qué se equivocó y cómo te diste cuenta?"</i>. Lo que digas debe coincidir con tu bitácora. Abajo hay <b>hechos reales de esta semana</b> como material; cuéntalos con tus palabras y confirma que son ciertos.</p>
+<h3>Cuando la IA se equivocó y cómo se descubrió</h3>
+<div class="card"><ul class="tight">
+  <li><b>Pago con Stripe real fallaba (21 nov).</b> El código creaba el pago con un parámetro que Stripe ya no acepta (<code>payment_method_types</code>). Las pruebas automáticas pasaban porque corren con el pago simulado; el error solo apareció al usar llaves reales de prueba y salió como "Ocurrió un error inesperado". Se confirmó llamando a Stripe directo y se arregló (commit <code>d272fd0</code>). <b>Lección:</b> las pruebas con pago simulado no demuestran que la integración real funcione.</li>
+  <li><b>Calendarios repetidos en Google (20 nov).</b> Al conectar, se veían 6 calendarios en vez de 3. La conexión y la tarea periódica corrían a la vez y cada una creaba los suyos. Lo detectaste con una captura de tu Google Calendar. Se arregló con una cola de una sola ejecución y una prueba que falla sin el arreglo (commit <code>b1f8839</code>).</li>
+  <li><b>Prueba que fallaba 1 de cada 6 veces (21 nov).</b> La base de datos guarda microsegundos y JavaScript milisegundos; un trabajo recién creado a veces parecía "del futuro". Se corrigió comparando a milisegundos (commit <code>1068ee4</code>).</li>
+  <li><b>Pruebas con credenciales reales.</b> La suite leía las llaves de Google de tu <code>.env</code> y no era hermética; se corre con esas variables vacías.</li>
+</ul></div>
+<h3>Decisiones de diseño y su porqué</h3>
+<div class="scroll"><table>
+  <tr><th>Decisión</th><th>Por qué</th></tr>
+  <tr><td>Cobro con captura manual (autorizar al pedir, cobrar al aceptar)</td><td>El negocio puede rechazar; así nunca se cobra por algo que no se confirmó. Rechazar o vencer solo libera la autorización.</td></tr>
+  <tr><td>Restricción de exclusión en PostgreSQL</td><td>La regla "no empalmar" no puede depender del código de la aplicación: con dos usuarios simultáneos solo la base lo garantiza.</td></tr>
+  <tr><td>Borrador de reserva (<code>pending</code> sin <code>submittedAt</code>) antes del pago</td><td>Permite apartar horario, crear el pago en Stripe y recuperarse de recargas o abandonos con tareas que limpian.</td></tr>
+  <tr><td>Cola de sincronización hacia Google (<code>calendar_sync_jobs</code>)</td><td>Si Google falla, la reserva sigue válida y se reintenta (RNF-17); aceptar nunca depende de Google.</td></tr>
+  <tr><td>Servicios externos opcionales con respaldo</td><td>El proyecto corre en cualquier laptop: pago simulado, sin Google y correos en consola. Decisión del 21 nov: dejar los correos en consola (sin SMTP real).</td></tr>
+  <tr><td>Hash del token de sesión en base</td><td>Si se filtrara la base, no se podrían usar las sesiones.</td></tr>
+  <tr><td>PIN del dueño con modo temporal de 5 minutos</td><td>Recepción puede usar la app sin ver pagos ni estadísticas; el dueño desbloquea lo sensible.</td></tr>
+  <tr><td>Anticipación mínima de 90 min para solicitudes manuales</td><td>La solicitud vence 1 h antes de la cita; con menos de 90 min el negocio no alcanzaría a responder. (Se documentó como requisito nuevo, RF-75.)</td></tr>
+  <tr><td>Solicitudes pendientes no bloquean horario</td><td>Dos clientes pueden pedir lo mismo; el negocio elige y el otro se rechaza solo al aceptar.</td></tr>
+  <tr><td>Colores sólidos, sin degradados</td><td>Regla de diseño: el degradado solo vive en el logo.</td></tr>
+</table></div>
+<div class="banner bad"><b>Pendiente obligatorio:</b> escribir en el repo la bitácora de IA y el diario de decisiones (por ejemplo <code>docs/bitacora-ia.md</code> y <code>docs/diario-de-decisiones.md</code>), con fechas, qué pediste, qué propuso la IA, qué rechazaste y qué corregiste.</div>
+
+<!-- ============ 13. COMANDOS ============ -->
+<h2 id="comandos">13. Comandos y cuentas de demo</h2>
+<div class="grid2">
+  <div class="card"><b>Comandos (en la raíz)</b><ul class="tight">
+    <li><code>pnpm dev</code> → API en :4000 y web en :5173</li>
+    <li><code>pnpm test</code> → pruebas de la API (base <code>reserya_test</code>)</li>
+    <li><code>pnpm lint</code> · <code>pnpm build</code></li>
+    <li><code>pnpm db:migrate</code> · <code>pnpm db:seed</code> · <code>pnpm db:reset</code></li>
+    <li><code>pnpm db:generate</code> → migración nueva desde <code>schema.js</code></li>
+    <li><code>stripe listen --events payment_intent.amount_capturable_updated,payment_intent.payment_failed --forward-to localhost:4000/api/webhooks/stripe</code></li></ul></div>
+  <div class="card"><b>Cuentas de demostración</b> (clave <code>demo1234</code>, PIN <code>1234</code>)<ul class="tight">
+    <li>Cliente: <code>ana@reserya.test</code></li>
+    <li>Negocio (Barbería El Patrón): <code>patron@reserya.test</code></li>
+    <li>Administrador: <code>admin@reserya.test</code></li>
+    <li>Tarjeta de prueba Stripe: <code>4242 4242 4242 4242</code>, fecha futura, CVC cualquiera (con Link: código <code>000000</code>)</li>
+    <li>Los correos salen escritos en la terminal de <code>pnpm dev</code></li></ul></div>
+</div>
+</main>
+</div>
+
+<script>
+const rows = [
+  ['Arranque del servidor', 'apps/api/src/index.js', 'Crea la app (<code>createApp</code>) y arranca las tareas periódicas (<code>startJobs</code>).'],
+  ['Montaje de rutas, helmet, CORS, cookies', 'apps/api/src/app.js', 'Orden importante: el webhook de Stripe va antes de <code>express.json()</code>.'],
+  ['Variables de entorno', 'apps/api/src/config/env.js', 'Validadas con zod; <code>APP_TZ = America/Tijuana</code>; <code>stripeEnabled</code> y <code>googleEnabled</code> deciden los respaldos.'],
+  ['Tablas de la base (esquema)', 'apps/api/src/db/schema.js', 'Todas las tablas y enums. Migraciones en <code>apps/api/drizzle/</code>.'],
+  ['Restricción contra reservas empalmadas', 'apps/api/drizzle/0001_exclusion.sql', '<code>bookings_no_overlap</code> con <code>btree_gist</code>, solo para hold y confirmed.'],
+  ['Datos de demostración (seed)', 'apps/api/src/db/seed/index.js y data.js', '18 negocios aprobados, 3 pendientes, 1 suspendido, 12 clientes y ~230 reservas.'],
+  ['Cargar sesión en cada petición', 'apps/api/src/middleware/auth.js :8', '<code>sessionMiddleware</code> deja <code>req.user</code>, <code>req.session</code> y <code>req.business</code>.'],
+  ['Revisar rol (cliente, negocio, admin)', 'apps/api/src/middleware/auth.js :23', '<code>requireRole</code>. También <code>requireReadyClient</code> :32 y <code>requireActiveBusiness</code> :43.'],
+  ['Crear y destruir sesión / cookie', 'apps/api/src/lib/session.js :19', '<code>createSession</code>, cookie <code>rsy_session</code>, hash SHA-256 en base.'],
+  ['Hash de contraseñas / PIN', 'apps/api/src/lib/crypto.js :9', '<code>hashSecret</code> con bcrypt (costo 10).'],
+  ['Cifrado de tokens de Google', 'apps/api/src/lib/crypto.js :20', '<code>encrypt</code>/<code>decrypt</code> AES-256-GCM con <code>ENCRYPTION_KEY</code>.'],
+  ['Clave de registro de negocio (ABCD-1234)', 'apps/api/src/lib/crypto.js :35', '<code>registrationCode</code>; las gestiona el admin en <code>modules/admin/routes.js</code>.'],
+  ['Validación de datos (zod)', 'apps/api/src/middleware/validate.js y lib/validators.js', 'Esquemas reutilizables: email, contraseña, teléfono MX, PIN, fechas.'],
+  ['Cómo se convierten los errores en respuestas', 'apps/api/src/middleware/error.js', 'zod → 400; <code>23P01</code> → 409 <code>slot_taken</code>; <code>23505</code> → 409 duplicado; el resto → 500.'],
+  ['Registro, login y logout', 'apps/api/src/modules/auth/routes.js :64 / :86 / :103', 'Con <code>loginLimiter</code> (:23).'],
+  ['Login con Google', 'apps/api/src/modules/auth/routes.js :181 y :198', 'Alcances básicos: openid, email, perfil.'],
+  ['Verificar correo y recuperar contraseña', 'apps/api/src/modules/auth/routes.js y lib/tokens.js', 'Tokens de un solo uso en <code>auth_tokens</code>.'],
+  ['Perfil del cliente (teléfono, contraseña)', 'apps/api/src/modules/auth/routes.js :251 (meRouter)', '<code>PATCH /api/me</code>, <code>POST /api/me/password</code>.'],
+  ['PIN del dueño: desbloquear, cambiar, recuperar', 'apps/api/src/modules/owner/routes.js', 'Bloqueo de 15 min por intentos fallidos (:20).'],
+  ['Modo dueño temporal (5 min)', 'apps/api/src/middleware/auth.js :52 y lib/session.js :9', '<code>requireOwnerMode</code> renueva el plazo en cada uso.'],
+  ['Registro de un negocio nuevo', 'apps/api/src/modules/business-setup/register.js', 'Pide clave de registro; el negocio queda pendiente hasta que el admin lo aprueba.'],
+  ['Aprobar, rechazar, suspender negocios', 'apps/api/src/modules/admin/routes.js :245 y siguientes', '<code>router.use(requireRole(\'admin\'))</code> protege todo el archivo.'],
+  ['Cuándo un negocio sale en búsquedas', 'apps/api/src/lib/businessReady.js', '<code>businessIsListed</code>: aprobado y con reglas completas (RF-71).'],
+  ['Servicios del negocio', 'apps/api/src/modules/business-setup/services.js', 'Precio en centavos, duración, activo.'],
+  ['Personas/espacios, horario semanal, días cerrados', 'apps/api/src/modules/business-setup/resources.js', 'Horario por bloques; <code>PUT /resources/:id/schedule</code>.'],
+  ['Reglas del negocio (anticipación, cancelación, descanso)', 'apps/api/src/modules/business-setup/rules.js', 'Anticipación solo permite 30, 60, 180, 300, 720 o 1440 min (check en <code>schema.js</code>).'],
+  ['Fotos del negocio', 'apps/api/src/modules/business-setup/profile.js y lib/storage.js', 'Se guardan en <code>uploads/</code> y se sirven en <code>/uploads</code>; la base guarda solo la llave.'],
+  ['Inicio, búsqueda, perfil público', 'apps/api/src/modules/public/routes.js (:41, :153, :185)', 'Sin sesión. Tarjetas y ordenamiento en <code>public/cards.js</code>.'],
+  ['Horarios libres de un día', 'apps/api/src/modules/public/availability.js :244', '<code>daySlots</code>, función pura. Carga de datos en <code>loadContexts</code> :67.'],
+  ['Primer horario libre ("próximo disponible")', 'apps/api/src/modules/public/availability.js :274', '<code>nextFreeSlot</code>, revisa hasta 14 días.'],
+  ['Anticipación mínima de 90 min', 'apps/api/src/modules/public/availability.js :38 y :46', '<code>REQUEST_MIN_NOTICE_MINUTES</code> y <code>effectiveMinNotice</code>.'],
+  ['Crear la reserva (borrador) y el pago', 'apps/api/src/modules/bookings/service.js :73', '<code>createDraft</code>: revalida horario, límite de 3 solicitudes, crea PaymentIntent.'],
+  ['Máximo 3 solicitudes pendientes', 'apps/api/src/modules/bookings/service.js :20', '<code>MAX_PENDING_REQUESTS</code>.'],
+  ['Apartado de 10 min / borrador de 30 min', 'apps/api/src/modules/bookings/service.js :22 y :24', '<code>HOLD_MINUTES</code>, <code>DRAFT_MINUTES</code>.'],
+  ['Pago autorizado → solicitud enviada / confirmada', 'apps/api/src/modules/bookings/service.js :227', '<code>applyAuthorized</code>, idempotente.'],
+  ['Cancelar siendo cliente', 'apps/api/src/modules/bookings/service.js :306', '<code>cancelByClient</code>; respeta <code>cancellationLimitHours</code>.'],
+  ['Vencer borradores y apartados', 'apps/api/src/modules/bookings/service.js :383', '<code>expireAbandonedDrafts</code>, tarea cada 60 s (<code>bookings/jobs.js</code>).'],
+  ['Elegir persona con "cualquiera"', 'apps/api/src/modules/bookings/service.js :167', '<code>leastBusyResource</code>.'],
+  ['Pagos con Stripe: autorizar, cobrar, liberar, reembolsar', 'apps/api/src/lib/payments.js', '<code>createAuthorization</code>, <code>capture</code>, <code>release</code>, <code>refund</code>. Todo el dinero pasa por aquí.'],
+  ['Pago simulado sin llaves', 'apps/api/src/lib/payments.js', '<code>paymentMode()</code>: ids que empiezan con <code>fake_</code>; ruta <code>fake-pay</code> en <code>bookings/routes.js</code> :300.'],
+  ['Aviso (webhook) de Stripe', 'apps/api/src/modules/webhooks/routes.js :40', 'Verifica firma, evita duplicados con <code>stripe_events</code>.'],
+  ['Aceptar una solicitud', 'apps/api/src/modules/business-ops/actions.js :65', '<code>acceptRequest</code>: transacción, cobro al final, rechaza empalmadas.'],
+  ['Rechazar / vencer solicitud', 'apps/api/src/modules/business-ops/actions.js :133 y :221', '<code>rejectRequest</code>, <code>expireRequests</code>.'],
+  ['Marcar "no asistió"', 'apps/api/src/modules/business-ops/actions.js :141', '<code>markNoShow</code>.'],
+  ['Cancelar siendo negocio', 'apps/api/src/modules/business-ops/actions.js :170', '<code>cancelByBusiness</code>: reembolso dentro de la transacción.'],
+  ['Citas completadas y recordatorios', 'apps/api/src/modules/business-ops/actions.js :241 y :256', '<code>completePastBookings</code>, <code>sendReminders</code> (24 h antes).'],
+  ['Agenda, estadísticas, pagos del negocio', 'apps/api/src/modules/business-ops/queries.js', '<code>buildAgenda</code> :131, <code>dashboard</code> :357, <code>stats</code> :454, <code>paymentHistory</code> :533.'],
+  ['Reglas de acceso de recepción vs dueño', 'apps/api/src/modules/business-ops/routes.js :25-26', '<code>reception</code> y <code>owner</code> (con <code>requireOwnerMode</code>).'],
+  ['Correos (plantillas y envío)', 'apps/api/src/lib/email.js y modules/*/emails.js', 'Sin <code>SMTP_URL</code> se imprimen en consola; todo se anota en <code>email_log</code>.'],
+  ['Reseñas y promedio de calificación', 'apps/api/src/modules/reviews/routes.js :26', 'Recalcula <code>ratingAvg</code> y <code>ratingCount</code> del negocio.'],
+  ['Agenda en vivo por enlace', 'apps/api/src/modules/live/routes.js y links.js', 'Token largo, sin teléfonos ni precios; el dueño crea/regenera/borra enlaces.'],
+  ['Conectar Google Calendar', 'apps/api/src/modules/calendar/routes.js :31 y :52', 'OAuth con estado en cookie; guarda token cifrado y crea calendarios.'],
+  ['Mandar cambios a Google (cola)', 'apps/api/src/modules/calendar/sync.js :360 y lib/calendarSync.js', '<code>processQueue</code>; <code>enqueueCalendarSync</code> solo inserta el trabajo.'],
+  ['Leer cambios de Google', 'apps/api/src/modules/calendar/sync.js :683 y google.js :204', '<code>pullChanges</code> cada 45 s; eventos ajenos bloquean horarios.'],
+  ['Cliente de la API de Google', 'apps/api/src/modules/calendar/google.js', 'Permisos (:14), <code>authUrl</code>, <code>calendarApi</code>, <code>listChanges</code>.'],
+  ['Tareas periódicas (reloj)', 'apps/api/src/jobs/index.js', 'Junta los <code>jobs.js</code> de bookings, business-ops y calendar.'],
+  ['Zona horaria y "ahora" de pruebas', 'apps/api/src/lib/time.js', '<code>now()</code>, <code>nowDate()</code>, <code>setNow()</code> para pruebas.'],
+  ['Mapa de URLs de la web', 'apps/web/src/router.jsx y apps/web/src/routes/*.jsx', 'Layout por rol; rutas protegidas con <code>RequireAuth</code>.'],
+  ['Llamadas a la API desde la web', 'apps/web/src/lib/api.js', '<code>api()</code> manda cookie y lanza <code>ApiError</code>; <code>fieldError</code> para campos.'],
+  ['Caché de datos y manejo de 401', 'apps/web/src/lib/query.js', 'TanStack Query; <code>onApiError</code> reacciona a sesión vencida.'],
+  ['Usuario actual en la web', 'apps/web/src/hooks/useAuth.js', '<code>useMe</code>, <code>useLogin</code>, <code>useLogout</code>, <code>homeFor</code>.'],
+  ['Flujo de reservar (4 pasos)', 'apps/web/src/pages/client/BookingFlow.jsx', '<code>Flow</code> :106, <code>DateTimeStep</code> :368, <code>ConfirmStep</code> :584.'],
+  ['Formulario de pago (Stripe o simulado)', 'apps/web/src/features/client/payment.jsx', '<code>StripeForm</code> :69, <code>FakeForm</code> :119, <code>HoldCountdown</code> :159.'],
+  ['Pantalla "solicitud enviada"', 'apps/web/src/pages/client/BookingSent.jsx', 'Confirma el pago contra la API por si el webhook tardó.'],
+  ['Menús (cliente, negocio, admin)', 'apps/web/src/components/layout/', '<code>ClientLayout</code>, <code>BusinessLayout</code>, <code>AdminLayout</code>, <code>AuthLayout</code>.'],
+  ['Pedir el PIN del dueño en la web', 'apps/web/src/components/layout/OwnerGate.jsx', 'Muestra el teclado de PIN antes de las pantallas del dueño.'],
+  ['Estados de carga, vacío y error', 'apps/web/src/components/States.jsx', '<code>LoadingList</code>, <code>EmptyState</code>, <code>ErrorState</code>.'],
+  ['Colores, tipografía y estilo', 'apps/web/src/index.css', 'Variables según <code>docs/alta-fidelidad/guia-de-estilo.svg</code>.'],
+  ['Títulos de pestaña y salto al contenido', 'apps/web/src/lib/pageTitle.js y router.jsx', '<code>useRouteTitle</code>, enlace "Saltar al contenido".'],
+  ['Formato de dinero y fechas', 'apps/web/src/lib/format.js', 'Pesos y fechas en español de México.'],
+  ['Pruebas automáticas', 'apps/api/test/*.test.js', '12 archivos, 107 pruebas; ayudas en <code>test/helpers.js</code>. La web no tiene pruebas automáticas.'],
+  ['Diseño de la base y cambios al implementar', 'docs/base-de-datos.md', 'Incluye la sección 8 con las diferencias respecto al diseño original.'],
+  ['Pantallas de alta fidelidad y guía de estilo', 'docs/alta-fidelidad/', 'SVG de cada pantalla.']
+];
+const tbody = document.querySelector('#where tbody');
+const input = document.getElementById('q');
+const count = document.getElementById('count');
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function render() {
+  const terms = norm(input.value).split(/\s+/).filter(Boolean);
+  const shown = rows.filter(r => {
+    const hay = norm(r.join(' ').replace(/<[^>]+>/g, ''));
+    return terms.every(t => hay.includes(t));
+  });
+  tbody.innerHTML = shown.map(r => '<tr><td>' + r[0] + '</td><td><code>' + r[1] + '</code></td><td>' + r[2] + '</td></tr>').join('');
+  count.textContent = shown.length === rows.length ? rows.length + ' entradas' : shown.length + ' de ' + rows.length + ' entradas';
+  if (!shown.length) tbody.innerHTML = '<tr><td colspan="3">Nada con esa palabra. Prueba con otra (por ejemplo "pago" o "horario").</td></tr>';
+}
+input.addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
