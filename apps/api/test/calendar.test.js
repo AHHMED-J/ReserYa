@@ -22,7 +22,7 @@ import { decrypt } from '../src/lib/crypto.js';
 import { enqueueCalendarSync } from '../src/lib/calendarSync.js';
 import { setGoogleClientFactory, nearestCalendarColor } from '../src/modules/calendar/google.js';
 import { processQueue, pullChanges, jobs } from '../src/modules/calendar/jobs.js';
-import { DELETED_REASON, MAX_ATTEMPTS } from '../src/modules/calendar/sync.js';
+import { DELETED_REASON, MAX_ATTEMPTS, ensureCalendars } from '../src/modules/calendar/sync.js';
 
 const BASE = 'https://www.googleapis.com/calendar/v3';
 
@@ -385,6 +385,24 @@ describe('conectar Google Calendar', () => {
     await processQueue();
     const r = await reload(s.resources, luis.id);
     assert.equal(google.calendars.get(r.googleCalendarId).summary, 'ReserYa · Luis');
+  });
+
+  it('si la conexión y la tarea periódica coinciden, no se repiten los calendarios', async () => {
+    const biz = await connectedBusiness({ resources: ['Juan'] });
+    await db.insert(s.resources).values([
+      { businessId: biz.business.id, name: 'Luis', color: '#0B7A55' },
+      { businessId: biz.business.id, name: 'Pedro', color: '#0A7DB2' },
+    ]);
+    const before = google.calendars.size;
+    await Promise.all([ensureCalendars(biz.business.id), ensureCalendars(), processQueue()]);
+    assert.equal(google.calendars.size - before, 2, 'solo un calendario nuevo por recurso');
+    const rows = await db
+      .select()
+      .from(s.resources)
+      .where(eq(s.resources.businessId, biz.business.id));
+    const ids = rows.map((r) => r.googleCalendarId);
+    assert.ok(ids.every(Boolean));
+    assert.equal(new Set(ids).size, rows.length);
   });
 });
 

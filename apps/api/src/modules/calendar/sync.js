@@ -215,7 +215,17 @@ export async function enqueueMissingEvents(businessId) {
  * Crea un calendario secundario "ReserYa · Nombre" por cada recurso activo que no tenga (RF-40),
  * con el color de Google más cercano al del recurso. Devuelve cuántos creó.
  */
-export async function ensureCalendars(businessId) {
+export function ensureCalendars(businessId) {
+  // Una sola ejecución a la vez: si la conexión y la tarea periódica corren juntas, ambas verían
+  // "faltan calendarios" y cada una crearía los suyos (calendarios repetidos en Google).
+  const run = ensureChain.then(() => createMissingCalendars(businessId));
+  ensureChain = run.catch(() => {});
+  return run;
+}
+
+let ensureChain = Promise.resolve();
+
+async function createMissingCalendars(businessId) {
   if (!env.googleEnabled) return 0;
   const rows = await db
     .select({ resource: resources, business: businesses })
