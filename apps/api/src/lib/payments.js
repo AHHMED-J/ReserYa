@@ -23,7 +23,9 @@ export async function createAuthorization({ amountCents, bookingId, description,
       amount: amountCents,
       currency: 'mxn',
       capture_method: 'manual',
-      payment_method_types: ['card'],
+      // Stripe ya no acepta payment_method_types: los métodos se activan en el Dashboard.
+      // Sin redirecciones, para que el pago se confirme sin salir de ReserYa.
+      automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
       description,
       receipt_email: email,
       metadata: { bookingId },
