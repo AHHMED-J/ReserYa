@@ -1,6 +1,6 @@
 # ReserYa · Diseño de la base de datos (borrador)
 
-Estado: **modelo cerrado, con diagrama de clases**. Todavía no se crea nada en PostgreSQL. El diagrama está en [reserya-base-de-datos.mdj](reserya-base-de-datos.mdj) (se abre con OpenUML) y en [reserya-base-de-datos.svg](reserya-base-de-datos.svg) para verlo rápido. La base de datos (Drizzle) se crea cuando se dé el visto bueno.
+Estado: **modelo implementado** con Drizzle en `apps/api/src/db/schema.js`. Los cambios que se hicieron al construirlo están en la sección 8. El diagrama está en [reserya-base-de-datos.mdj](reserya-base-de-datos.mdj) (se abre con OpenUML) y en [reserya-base-de-datos.svg](reserya-base-de-datos.svg) para verlo rápido.
 
 Basado en los requerimientos RF-01 a RF-74 y RNF-01 a RNF-23 de [ReserYa - Requerimientos](https://docs.google.com/document/d/1sVQjgROe-PpVyUZo8RpXvWsD48Ap8enAWa7ZGCXBfOs/edit).
 
@@ -227,4 +227,28 @@ No quedan decisiones pendientes.
 
 ## 7. Siguiente paso
 
-El modelo y el diagrama de clases están listos. La explicación con capturas está en el Doc [ReserYa - Diagrama de clases](https://docs.google.com/document/d/1tcAODGlil4GxMmSTHB7FCPa-akYMLFI4oXkEa7rkaQM/edit). La creación de la base de datos con Drizzle queda para cuando me digas que todo está listo.
+La explicación del diagrama con capturas está en el Doc [ReserYa - Diagrama de clases](https://docs.google.com/document/d/1tcAODGlil4GxMmSTHB7FCPa-akYMLFI4oXkEa7rkaQM/edit). La base de datos se crea con `pnpm db:reset` (migraciones de Drizzle y datos de demostración).
+
+## 8. Cambios hechos al implementar
+
+El esquema real sigue el modelo de arriba. Estas son las diferencias, para que el diagrama y el código coincidan.
+
+| Tabla | Cambio | Motivo |
+|---|---|---|
+| `sessions` | Columna nueva `owner_unlocked_until` | Guarda hasta cuándo está desbloqueado el modo dueño y se renueva con cada uso (RF-07) |
+| `categories` | Columna nueva `icon` | Nombre del ícono que usa la web para cada categoría |
+| `businesses` | Columnas nuevas `approved_at` y `google_email` | Fecha de aprobación (se muestra al administrador) y cuenta de Google conectada (sirve para detectar si el dueño reconecta otra cuenta o si se perdió la conexión) |
+| `resources` | Columna nueva `title` | Rol o descripción corta del recurso ("Barbero", "Cancha techada") |
+| `bookings` | Columna nueva `submitted_at` | Momento en que el pago queda autorizado y la solicitud entra a la cola del negocio |
+| `payments` | Estado nuevo `pending` | El cliente todavía no termina de pagar y no hay autorización |
+| `live_links` | `token` en lugar de `token_hash` | El dueño vuelve a copiar el link, así que el token se guarda tal cual. Regenerar revoca el anterior |
+| `external_busy_blocks` | Columna nueva `title` | Nombre del evento personal de Google que bloquea el horario |
+| `users` | `last_name` obligatorio con valor vacío por omisión | Las cuentas de Google a veces no traen apellido |
+
+**Borradores de reserva.** Al elegir horario se crea la reserva en `pending` (o `hold` con aceptación automática) con el pago en `pending`. Mientras `submitted_at` esté vacío es un borrador: no aparece en la cola del negocio. Al autorizarse el pago se llena `submitted_at` y `respond_by` y entra a la cola (RF-26, RF-31).
+
+**Anticipación de 90 minutos (RF-75).** Una solicitud que el negocio debe aceptar a mano vence una hora antes de la cita. Por eso se exige al menos 90 minutos de anticipación aunque `min_notice_minutes` sea menor. Con aceptación automática se usa `min_notice_minutes` tal cual. La constante está en `apps/api/src/modules/public/availability.js`.
+
+**Restricción de exclusión.** Drizzle no expresa `EXCLUDE USING gist`, así que vive en la migración `0001_exclusion.sql` junto con la extensión `btree_gist` (RNF-15).
+
+**Datos fijos.** El correo de contacto que ve un negocio rechazado o suspendido es `soporte@reserya.test`, una constante en `apps/api/src/modules/admin/routes.js`.
