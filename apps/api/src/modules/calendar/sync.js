@@ -396,7 +396,9 @@ async function processQueueNow({ businessId } = {}) {
     .where(
       and(
         eq(calendarSyncJobs.status, 'pending'),
-        lte(calendarSyncJobs.nextAttemptAt, nowDate()),
+        // La base guarda microsegundos y JS milisegundos: sin truncar, un trabajo recién creado
+        // podía parecer "del futuro" durante menos de 1 ms y quedarse sin procesar.
+        lte(sql`date_trunc('milliseconds', ${calendarSyncJobs.nextAttemptAt})`, nowDate()),
         businessId ? eq(businesses.id, businessId) : undefined,
       ),
     )
