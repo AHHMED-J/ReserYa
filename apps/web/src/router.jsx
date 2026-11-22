@@ -22,6 +22,7 @@ import ForgotPassword from '@/pages/auth/ForgotPassword';
 import ResetPassword from '@/pages/auth/ResetPassword';
 import Legal from '@/pages/legal/Legal';
 import NotFound from '@/pages/NotFound';
+import RouteError from '@/pages/RouteError';
 import { useRouteTitle } from '@/lib/pageTitle';
 
 function Root() {
@@ -43,6 +44,7 @@ function Root() {
 export const router = createBrowserRouter([
   {
     element: <Root />,
+    errorElement: <RouteError />,
     children: [
       { path: '/', element: <ClientLayout />, children: clientRoutes },
       {
