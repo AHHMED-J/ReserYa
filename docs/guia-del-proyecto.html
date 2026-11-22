@@ -122,7 +122,7 @@
 <div class="scroll"><table>
   <tr><th>Requisito</th><th>Estado</th><th>Detalle</th></tr>
   <tr><td>Liga al repositorio de GitHub</td><td><span class="pill ok">Listo</span></td><td><code>https://github.com/AHHMED-J/ReserYa</code>. Último commit publicado: <code>1068ee4</code>. No subas nada que rompa el proyecto antes del domingo.</td></tr>
-  <tr><td><b>Bitácora de IA y diario de decisiones dentro del repositorio</b></td><td><span class="pill bad">Falta</span></td><td>No existe en el repo (solo está <code>docs/base-de-datos.md</code>). Es <b>obligatoria</b> y sin ella no presentas. Además alimenta 4 pts (criterio) y 2 pts (proceso). Es lo primero que hay que resolver.</td></tr>
+  <tr><td><b>Bitácora de IA y diario de decisiones dentro del repositorio</b></td><td><span class="pill ok">Listo</span> <span class="pill warn">revisar</span></td><td><code>docs/bitacora-ia.md</code> (en el repo) y una copia en Google Docs. Incluye reglas de trabajo, bitácora por día, 24 decisiones y 15 errores de la IA. Léela completa y corrige lo que no lo dijiste así: te preguntarán sobre ella (4 pts) y cuenta para proceso (2 pts).</td></tr>
   <tr><td>Liga al proyecto desplegado (si hay)</td><td><span class="pill warn">Decidir</span></td><td>No hay despliegue. La tarea dice "en caso de contar con despliegue", pero la presentación habla de "la versión desplegada". Pregunta al profe si basta correrlo en tu laptop.</td></tr>
   <tr><td>Producto funcionando (4 pts, incluye caso límite)</td><td><span class="pill ok">Listo</span> <span class="pill warn">repasar</span></td><td>107 pruebas automáticas de la API pasan. Google y Stripe están verificados con cuentas reales de prueba. Falta que tú intentes romper la app (sección 10).</td></tr>
   <tr><td>Mapa del sistema (4 pts)</td><td><span class="pill warn">Estudiar</span></td><td>Esta guía. Practica con el buscador de la sección 4.</td></tr>
@@ -130,7 +130,7 @@
   <tr><td>Criterio y decisiones (4 pts)</td><td><span class="pill warn">Depende de la bitácora</span></td><td>Lo que digas debe coincidir con la bitácora. Ver sección 12.</td></tr>
   <tr><td>Proceso: commits incrementales (2 pts)</td><td><span class="pill ok">Listo</span></td><td>55 commits en 5 días (13, 16, 19, 20 y 21 de nov), mensajes descriptivos en español.</td></tr>
 </table></div>
-<div class="banner bad"><b>Hueco más importante:</b> falta la bitácora de IA y el diario de decisiones en el repo. Hay que escribirlos y subirlos antes del domingo 11:59 pm, y deben ser honestos y tuyos (qué te propuso la IA, qué rechazaste, en qué se equivocó).</div>
+<div class="banner warn"><b>Pendiente más importante:</b> subir a GitHub antes del domingo 22, 11:59 pm (se califica el último commit antes de esa hora) y entregar la liga en Classroom. Decidir lo del despliegue con el profe.</div>
 
 <!-- ============ 2. ARQUITECTURA ============ -->
 <h2 id="arquitectura">2. Arquitectura: quién habla con quién</h2>
@@ -378,7 +378,7 @@ Significa: <i>una misma persona no puede tener dos reservas hold/confirmed cuyos
 
 <!-- ============ 8. RUTAS ============ -->
 <h2 id="rutas">8. Pantallas (web) y su API</h2>
-<p class="lead">Mapa de URLs en <code>apps/web/src/router.jsx</code> (:43), que reparte en <code>routes/client.jsx</code>, <code>businessSetup.jsx</code>, <code>businessOps.jsx</code>, <code>calendar.jsx</code> y <code>admin.jsx</code>. Datos con TanStack Query: <code>features/*/queries.js</code> o <code>hooks.js</code>.</p>
+<p class="lead">Mapa de URLs en <code>apps/web/src/router.jsx</code> (:44), que reparte en <code>routes/client.jsx</code>, <code>businessSetup.jsx</code>, <code>businessOps.jsx</code>, <code>calendar.jsx</code> y <code>admin.jsx</code>. Datos con TanStack Query: <code>features/*/queries.js</code> o <code>hooks.js</code>.</p>
 <div class="scroll"><table>
   <tr><th>URL</th><th>Pantalla (archivo)</th><th>Llama a</th></tr>
   <tr><td><code>/</code></td><td><code>pages/client/Home.jsx</code></td><td><code>GET /public/home</code></td></tr>
@@ -437,8 +437,8 @@ Significa: <i>una misma persona no puede tener dos reservas hold/confirmed cuyos
   <tr><td>Demasiados intentos de login</td><td>429 con mensaje "Demasiados intentos. Espera unos minutos."</td><td><code>auth/routes.js</code> :23</td><td>✔ (te pasó hoy)</td></tr>
   <tr><td>URL que no existe</td><td>Página 404 (web) o JSON 404 (API)</td><td><code>pages/NotFound.jsx</code>, <code>app.js</code></td><td>✔</td></tr>
   <tr><td>Foto muy pesada o archivo falso</td><td>Límite de 5 MB y detección por contenido, con error en español</td><td><code>profile.js</code> :88-110</td><td>✔</td></tr>
-  <tr><td>API apagada o lenta</td><td>Las listas muestran <code>ErrorState</code> con botón "Reintentar"; pero el mensaje sería técnico ("Failed to fetch") porque <code>api()</code> no traduce fallos de red</td><td><code>States.jsx</code>, <code>lib/api.js</code></td><td>⚠ mejorable</td></tr>
-  <tr><td>Un componente se rompe al dibujar</td><td><b>No hay</b> <code>errorElement</code> en el router: saldría la pantalla de error por defecto de React Router</td><td><code>router.jsx</code></td><td>⚠ hueco real (arreglo de pocas líneas)</td></tr>
+  <tr><td>API apagada o lenta</td><td>Las listas muestran <code>ErrorState</code> con botón "Reintentar" y un mensaje claro: "No pudimos conectar con el servidor…" (sin internet) o "El servidor no está disponible…" (error 5xx sin respuesta de la API)</td><td><code>States.jsx</code>, <code>lib/api.js</code> (<code>NETWORK_MESSAGE</code>)</td><td>✔ (comprobado con una prueba de código, no apagando la API en el navegador)</td></tr>
+  <tr><td>Un componente se rompe al dibujar</td><td>Pantalla "Algo salió mal" con botones Reintentar e Ir al inicio, en lugar de la pantalla por defecto de React Router</td><td><code>pages/RouteError.jsx</code>, <code>errorElement</code> en <code>router.jsx</code></td><td>✔</td></tr>
   <tr><td>Google o Stripe fallan</td><td>El correo o la sincronización fallan sin tumbar la reserva; Google reintenta hasta 8 veces; si Stripe falla al aceptar, se revierte la transacción</td><td><code>email.js</code> (try/catch), <code>sync.js</code> :39, <code>actions.js</code> :65</td><td>✔</td></tr>
 </table></div>
 <div class="banner warn"><b>Antes del domingo:</b> recorre cada fila de esta tabla en el navegador con la app corriendo. Si algo falla y puedes explicar por qué y cómo lo arreglarías, también cuenta.</div>
@@ -497,7 +497,7 @@ Significa: <i>una misma persona no puede tener dos reservas hold/confirmed cuyos
   <tr><td>Solicitudes pendientes no bloquean horario</td><td>Dos clientes pueden pedir lo mismo; el negocio elige y el otro se rechaza solo al aceptar.</td></tr>
   <tr><td>Colores sólidos, sin degradados</td><td>Regla de diseño: el degradado solo vive en el logo.</td></tr>
 </table></div>
-<div class="banner bad"><b>Pendiente obligatorio:</b> escribir en el repo la bitácora de IA y el diario de decisiones (por ejemplo <code>docs/bitacora-ia.md</code> y <code>docs/diario-de-decisiones.md</code>), con fechas, qué pediste, qué propuso la IA, qué rechazaste y qué corregiste.</div>
+<div class="banner warn"><b>Antes de presentar:</b> lee <code>docs/bitacora-ia.md</code> completa. Lo que digas en el punto 4 debe coincidir con ella.</div>
 
 <!-- ============ 13. COMANDOS ============ -->
 <h2 id="comandos">13. Comandos y cuentas de demo</h2>
@@ -587,6 +587,7 @@ const rows = [
   ['Pantalla "solicitud enviada"', 'apps/web/src/pages/client/BookingSent.jsx', 'Confirma el pago contra la API por si el webhook tardó.'],
   ['Menús (cliente, negocio, admin)', 'apps/web/src/components/layout/', '<code>ClientLayout</code>, <code>BusinessLayout</code>, <code>AdminLayout</code>, <code>AuthLayout</code>.'],
   ['Pedir el PIN del dueño en la web', 'apps/web/src/components/layout/OwnerGate.jsx', 'Muestra el teclado de PIN antes de las pantallas del dueño.'],
+  ['Pantalla de error general (algo se rompe al dibujar)', 'apps/web/src/pages/RouteError.jsx', '<code>errorElement</code> del router: "Algo salió mal" con Reintentar e Ir al inicio.'],
   ['Estados de carga, vacío y error', 'apps/web/src/components/States.jsx', '<code>LoadingList</code>, <code>EmptyState</code>, <code>ErrorState</code>.'],
   ['Colores, tipografía y estilo', 'apps/web/src/index.css', 'Variables según <code>docs/alta-fidelidad/guia-de-estilo.svg</code>.'],
   ['Títulos de pestaña y salto al contenido', 'apps/web/src/lib/pageTitle.js y router.jsx', '<code>useRouteTitle</code>, enlace "Saltar al contenido".'],

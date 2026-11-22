@@ -88,6 +88,7 @@ Lo que se puede comprobar en el repositorio: 107 pruebas automáticas de la API 
 | Configurar Stripe en modo de prueba. | Dio los pasos, indicó que "Custom payment flow" era la opción correcta y corrigió el comando del webhook. | Llaves y webhook configurados por el estudiante, y comprobados por la IA sin mostrar los valores. |
 | El pago mostraba "Ocurrió un error inesperado". | Reprodujo la llamada a Stripe, encontró que el parámetro payment_method_types ya no se acepta y lo cambió. | Commit d272fd0. Un pago de 200 pesos se cobró al aceptar (succeeded) y otro se canceló al rechazar (canceled). |
 | Subir a GitHub y correos con su Gmail. | Subió 2 commits. Guió la contraseña de aplicación de Gmail. | Gmail rechazó las credenciales (error 535). El estudiante decidió dejar los correos en la consola y la IA vació el SMTP_URL del .env. |
+| Arreglar los dos huecos de casos límite encontrados en la revisión. | Agregó una pantalla de error general (Algo salió mal, con Reintentar e Ir al inicio) y mensajes claros cuando la API no responde o no hay conexión. Comprobó la pantalla y los mensajes con pruebas de código. | Commit 7128ab6. |
 | Revisar si se cumple lo que pide el profesor para la entrega. | Comparó el repositorio con el aviso: faltaban la bitácora y el diario de decisiones. Creó una guía en HTML con el mapa del proyecto. | Commit 33c4eb7 y esta bitácora. |
 
 ## 4. Diario de decisiones
@@ -153,8 +154,8 @@ Quién decidió: E es el estudiante, IA es una propuesta de la IA que el estudia
 
 - No hay versión desplegada: la demostración corre en local.
 - Los correos se imprimen en la consola de la API porque no hay SMTP configurado.
-- El enrutador de la web no tiene pantalla de error general; si un componente falla al dibujarse, se vería la pantalla por defecto de React Router.
-- Si la API no responde, el mensaje que ve el usuario es técnico.
+- No se ha recorrido a mano toda la lista de casos límite en el navegador (campos vacíos, doble clic, recargar a mitad del pago).
+- La pantalla de error general y los mensajes de red caída se comprobaron con pruebas de código, no apagando la API en el navegador.
 - Las fotos del estudiante que no se subieron al repositorio siguen solo en su computadora.
 
 ## 8. Enlaces y commits
@@ -176,4 +177,4 @@ Quién decidió: E es el estudiante, IA es una propuesta de la IA que el estudia
 | 16 nov: cambios de Cambios ReserYa.md | f5c7baf |
 | 19 nov: títulos de pestaña y salto al contenido | 43bf6c2, 2ad1a84 |
 | 20 nov: documentación del modelo y arreglo de calendarios repetidos | 4d51ed3, b1f8839 |
-| 21 nov: Stripe real, prueba intermitente y guía del proyecto | d272fd0, 1068ee4, 33c4eb7 |
+| 21 nov: Stripe real, prueba intermitente, guía del proyecto y pantalla de error | d272fd0, 1068ee4, 33c4eb7, 7128ab6 |
